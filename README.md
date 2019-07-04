@@ -3,7 +3,7 @@ __Sira🍋__ is a proof-of-concept sprite combiner, made to bring trainercards c
 Initially started as quick experiment, it was developed to prove usiability of [.NET](https://github.com/dotnet) and [NodeJS](https://nodejs.org/en/) combination.
 
 # :.Featuræ.:
-* Proves (at least some) future for desktop JS/CS/TS outsaide of [Electon](https://electronjs.org/)
+* Proves (at least some) future for desktop JS/CS/TS outsaide of [Electon](https://electronjs.org/)/
 
 # :.Reassembling.:
 __Sira🍋__ was developed in [CoffeeScript v2](https://coffeescript.org/) with tiny [C#](https://github.com/dotnet/csharplang) bootstrap, which can be built by script provided in `src\release.cmd`  
