@@ -6,8 +6,9 @@ __Sprite cache:__ https://github.com/Guevara-chan/SiraLime/releases/download/res
 
 # :.Featuræ.:
 * Semaless integration: just pick `Options->Export Character/Creature Data` in S3 and run SiraLime.exe to render card.
+* All 792 creature sprites directly from developer (can optionally be downloaded for faster access).
 * Proves (at least some) future for desktop JS/CS/TS development outside of [Electon](https://electronjs.org/).
-* All 792 creature sprites directly from developer (can be downloaded to render faster).
+
 
 # :.Reassembling.:
 __Sira🍋__ was developed in [CoffeeScript v2](https://coffeescript.org/) with tiny [C#](https://github.com/dotnet/csharplang) bootstrap, which can be built by script provided in `src\release.cmd`  
