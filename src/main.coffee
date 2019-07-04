@@ -19,13 +19,20 @@ class Lineup
 		if dest? then Lineup.save(@bmp, dest)
 		System.Windows.Clipboard.SetData System.Windows.Forms.DataFormats.Bitmap, @bmp
 
+	@load_sprite: (crit_name) =>
+		try return new Bitmap("res\\#{name}.png")
+		client = new System.Net.WebClient()
+		stream = client.
+			OpenRead "https://raw.githubusercontent.com/Guevara-chan/SiraLime/master/res/#{encodeURI crit_name}.png"
+		return new Bitmap(stream)
+
 	@parse_export: (src = System.IO.File.ReadAllText _cache) =>
 		# Aux procedures.
 		crit_data = (chunks) =>
 			if chunks[chunks.length-1] == '(Nether)' then chunks.pop()
 			level:	chunks[1]
 			name:	name = chunks[2..].join(' ')
-			sprite:	new Bitmap("res\\#{name}.png")
+			sprite:	Lineup.load_sprite(name)#
 		# Main parser.
 		feed = src.split('\r\n')
 		if feed[0] is '========== CHARACTER ==========' # If header is valid...
