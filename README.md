@@ -5,4 +5,3 @@ Initially started as quick experiment, it was developed to prove usiability of [
 # :.Reassembling.:
 __Sira🍋__ was developed in [CoffeeScript v2](https://coffeescript.org/) with tiny [C#](https://github.com/dotnet/csharplang) bootstrap.  
 It requires .NET 4.5 framework and latest [node-clr](https://github.com/AtsushiSuzuki/node-clr) by AtsushiSuzuki to run.  
-__Memo:__ use `npm i "git://github.com/AtsushiSuzuki/node-clr.git#f6ff21b5938a794267597390d8d1fbb22a77fd02"` to build `node-clr` for NodeJS >9.
