@@ -3,7 +3,7 @@ __Sira🍋__ is a proof-of-concept sprite combiner, made to bring trainercards c
 Initially started as quick experiment, it was developed to prove usiability of [.NET](https://github.com/dotnet) and [NodeJS](https://nodejs.org/en/) combination.
 
 # :.Featuræ.:
-* Semaless integration: just pick `Options->Export Character/Creature Data` in S3 and run SiraLime.exe to render new card.
+* Semaless integration: just pick `Options->Export Character/Creature Data` in S3 and run SiraLime.exe to render card.
 * Proves (at least some) future for desktop JS/CS/TS development outside of [Electon](https://electronjs.org/).
 * All 792 creature sprites directly from developer.
 
