@@ -1,7 +1,8 @@
 # :.Sum.:
 __Sira🍋__ is a proof-of-concept sprite combiner, made to bring trainercards concept from _Pokémon_ series to [Siralim 3](https://store.steampowered.com/app/841770/Siralim_3/).  
-Initially started as quick experiment, it was developed to prove usiability of [.NET](https://github.com/dotnet) and [NodeJS](https://nodejs.org/en/) combination.
+Initially started as quick experiment, it was developed to prove usiability of [.NET](https://github.com/dotnet) and [NodeJS](https://nodejs.org/en/) combination.  
 __Latest version:__ https://github.com/Guevara-chan/SiraLime/releases/download/0.1/SiraLime.zip (direct link)  
+__Sprite cache:__ https://github.com/Guevara-chan/SiraLime/releases/download/res/res.zip (direct link, not required)
 
 # :.Featuræ.:
 * Semaless integration: just pick `Options->Export Character/Creature Data` in S3 and run SiraLime.exe to render card.
