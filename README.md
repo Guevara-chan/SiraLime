@@ -4,4 +4,4 @@ Initially started as quick experiment, it was developed to prove usiability of [
 
 # :.Reassembling.:
 __Sira🍋__ was developed in [CoffeeScript v2](https://coffeescript.org/) with tiny [C#](https://github.com/dotnet/csharplang) bootstrap, which can be built by sript provided in `src\release.cmd`.  
-It requires .NET 4.5 framework and latest [node-clr](https://github.com/AtsushiSuzuki/node-clr) by AtsushiSuzuki to run.
+It requires .NET 4.5 framework, [NNodeJS 12+](https://nodejs.org/en/download/current/) and latest [node-clr](https://github.com/AtsushiSuzuki/node-clr) by AtsushiSuzuki to run.
