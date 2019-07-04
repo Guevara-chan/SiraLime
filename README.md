@@ -10,3 +10,6 @@ Initially started as quick experiment, it was developed to prove usiability of [
 # :.Reassembling.:
 __Sira🍋__ was developed in [CoffeeScript v2](https://coffeescript.org/) with tiny [C#](https://github.com/dotnet/csharplang) bootstrap, which can be built by script provided in `src\release.cmd`  
 It requires .NET 4.5 framework, [NodeJS 12+](https://nodejs.org/en/download/current/) (which goes to `bin` subdir) and latest [node-clr](https://github.com/AtsushiSuzuki/node-clr) by AtsushiSuzuki to run.
+
+# :.Brief sampling of Me and the Boys.:
+![image](https://user-images.githubusercontent.com/8768470/60662149-43079780-9e64-11e9-9cae-ef733748b40a.png)
