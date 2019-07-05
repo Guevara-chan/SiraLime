@@ -34,12 +34,13 @@ class SiralimData
 
 	crit_data: (fragment) ->
 		[naming, typing] = fragment.map (x) -> x.split ' '
-		nether: if naming[naming.length-1] == '(Nether)' then naming.pop(); nether = true else false
-		name:	name = naming[2..].join(' ')
-		level:	naming[1]
-		kind:	typing[0..typing.length-3].join ' '
-		class:	typing[typing.length-1]
-		sprite:	@load_sprite(name)
+		nether:		if naming[naming.length-1] == '(Nether)' then naming.pop(); nether = true else false
+		name:		name = naming[2..].join(' ')
+		level:		naming[1]
+		kind:		typing[0..typing.length-3].join ' '
+		class:		typing[typing.length-1]
+		sprite:		@load_sprite(name)
+		arttrait:	(fragment.find((x) -> x.startsWith 'Trait: ')?.split(' ')[1..].join(' ')) ? ""
 
 	load_sprite: (crit_name) ->
 		cache_file = "res\\#{crit_name}.png"
@@ -136,7 +137,8 @@ class CUI
 		@say "┌", 'white', 
 			"#{team.length} creatures of #{player.gender} #{player.name} 
 			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
-		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class]) for crit in team
+		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class}) ", 
+			@color_code[crit.class], crit.arttrait, 'darkGray') for crit in team
 		@say "└", 'white', "Generating teamcard...", 'yellow'
 		return s3data
 
