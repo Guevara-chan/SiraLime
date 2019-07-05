@@ -15,6 +15,6 @@ __Sira🍋__ was developed in [CoffeeScript v2](https://coffeescript.org/) with 
 It requires .NET 4.5 framework, [NodeJS 12+](https://nodejs.org/en/download/current/) (which goes to `bin` subdir) and latest [node-clr](https://github.com/AtsushiSuzuki/node-clr) by AtsushiSuzuki to run.
 
 # :.Brief sampling of Me and the Boys.:
-![image](https://user-images.githubusercontent.com/8768470/60716128-49ab1300-9f27-11e9-8470-784bca1f9347.png)
+![image](https://user-images.githubusercontent.com/8768470/60717413-6268f800-9f2a-11e9-810b-cd77453aa54b.png)
 ![image](https://user-images.githubusercontent.com/8768470/60717258-056d4200-9f2a-11e9-9dff-b4e93d242ce1.png)
 ![image](https://user-images.githubusercontent.com/8768470/60717358-3cdbee80-9f2a-11e9-94e2-caf3a07b5bc7.png)
