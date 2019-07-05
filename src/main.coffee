@@ -60,10 +60,9 @@ class Lineup
 		Sorcery:Color.Cyan
 
 	# --Methods goes here.
-	constructor: (src, pipe, show_off, dest) ->
-		@bmp = show_off @render pipe new SiralimData src
-		if dest? then Lineup.save(@bmp, dest)
-		System.Windows.Clipboard.SetData System.Windows.Forms.DataFormats.Bitmap, @bmp
+	constructor: (s3data, pipe, show_off, dest = 'last.png') ->
+		@bmp = show_off @render pipe s3data
+		@save(dest)
 
 	print_centered: (out, txt, font, x, y, color) ->
 		System.Windows.Forms.TextRenderer.DrawText out, txt, font, 
@@ -115,8 +114,9 @@ class Lineup
 			@print_centered out, text, capfont, grid.xres * (idx % 3 + 0.5) , cap.y, @color_code[crit.class]
 		return result
 
-	@save: (lineup, dest = "Team.png") =>
-		lineup.Save(dest, Imaging.ImageFormat.Png)
+	save: (dest) =>		
+		System.Windows.Clipboard.SetData System.Windows.Forms.DataFormats.Bitmap, @bmp
+		@bmp.Save(dest, Imaging.ImageFormat.Png) if dest
 # -------------------
 class CUI
 	color_code:
@@ -163,11 +163,12 @@ class CUI
 #.}
 
 # --Main code--
-ui = new CUI
-try
-	System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-	feed = undefined unless try new SiralimData feed=System.Windows.Clipboard.GetText()
-	new Lineup(feed, ui.pipe.bind(ui), ui.show_off.bind(ui), "last.png")
+System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
+try 
+	ui = new CUI
+	feed = try new SiralimData System.Windows.Clipboard.GetText() catch
+		new SiralimData
+	new Lineup(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
 catch ex
 	ui.fail(ex)
 ui.done()
