@@ -1,6 +1,6 @@
 header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-	# SiraLime teamcards renderer v0.1
+	# SiraLime teamcards renderer v0.2
 	# Developed in 2019 by Guevara-chan
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
@@ -95,7 +95,7 @@ class Lineup
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
 		# Header drawing.
 		hdrbrush = new SolidBrush(@set_alpha @color_code[player.class])
-		@draw_block out, 0, 0, grid.xres, grid.header-3, bgpen, hdrbrush
+		@draw_block out, 0, 0, grid.xres, grid.header-3, bgpen, new SolidBrush(@set_alpha @color_code[player.class])
 		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header-3, bgpen, hdrbrush 
 		@print_centered out, "#{player.gender} #{player.name}", hdrfont, grid.xres * 0.5, 0, Color.Coral
 		@print_centered out, "lvl#{player.level}|#{player.class}", hdrfont, grid.xres * 2.5, 0,@color_code[player.class]
