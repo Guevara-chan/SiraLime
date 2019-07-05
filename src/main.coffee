@@ -138,7 +138,7 @@ class CUI
 			"#{team.length} creatures of #{player.gender} #{player.name} 
 			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
 		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class}) ", 
-			@color_code[crit.class], crit.arttrait, 'darkGray') for crit in team
+			@color_code[crit.class], (if crit.arttrait then "/" else "") + crit.arttrait, 'darkGray') for crit in team
 		@say "└", 'white', "Generating teamcard...", 'yellow'
 		return s3data
 
