@@ -59,6 +59,7 @@ class Lineup
 		Nature:	Color.Chartreuse
 		Life:	Color.GhostWhite
 		Sorcery:Color.Cyan
+	TR = System.Windows.Forms.TextRenderer
 
 	# --Methods goes here.
 	constructor: (s3data, pipe, show_off, dest = 'last.png') ->
@@ -66,8 +67,7 @@ class Lineup
 		@save(dest)
 
 	print_centered: (out, txt, font, x, y, color) ->
-		System.Windows.Forms.TextRenderer.DrawText out, txt, font, 
-			new Point(x - (out.MeasureString(txt, font).Width / 2), y), color
+		TR.DrawText out, txt, font, new Point(x - (TR.MeasureText(txt, font).Width / 2), y), color
 
 	draw_block: (out, x, y, width, height, pen, brush) ->
 		out.FillRectangle brush, x, y, width, height
@@ -82,14 +82,15 @@ class Lineup
 		grid =
 			xres: team[0].sprite.Width * scale
 			yres: team[0].sprite.Height * scale
-			caption: 22.5 * scale
+			caption: 18.5 * scale
 			header: 12.5 * scale
-		result	= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
-		out		= Graphics.FromImage(result)
-		capfont	= new Font("Sylfaen", 5.5 * scale)
-		hdrfont	= new Font("Sylfaen", 6 * scale, FontStyle.Bold)
-		cappen	= new Pen(System.Drawing.Color.FromArgb(10, 10, 10), 2)
-		rbrush	= new SolidBrush(System.Drawing.Color.FromArgb(210, 40, 40, 40))
+		result		= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
+		out			= Graphics.FromImage(result)
+		capfont		= new Font("Sylfaen", 5.5 * scale)
+		traitfont	= new Font("Sylfaen", 4.5 * scale)
+		hdrfont		= new Font("Sylfaen", 6 * scale, FontStyle.Bold)
+		cappen		= new Pen(System.Drawing.Color.FromArgb(10, 10, 10), 2)
+		rbrush		= new SolidBrush(System.Drawing.Color.FromArgb(210, 40, 40, 40))
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
 		out.InterpolationMode	= System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor
 		# BG drawing.
@@ -112,17 +113,17 @@ class Lineup
 			out.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
 			# Name drawing.
 			text = "#{crit.name}"#" lvl#{crit.level}"
-			cap	= {width: out.MeasureString(text, capfont).Width, height: out.MeasureString(text, capfont).Height}
+			cap	= {width: (TR.MeasureText(text, capfont)).Width, height: (TR.MeasureText(text, capfont)).Height}
 			[cap.x,cap.y] = [x + (grid.xres-cap.width) / 2, y + grid.yres]
 			@draw_block out,cap.x,cap.y,cap.width,cap.height,cappen,new SolidBrush @set_alpha @color_code[crit.class],30
 			@print_centered out, text, capfont, grid.xres * (idx % 3 + 0.5) , cap.y, @color_code[crit.class]
 			# Additional trait drawing.
 			if crit.arttrait
 				[yoff, xoff, twidth] = [cap.y+cap.height, grid.xres * (idx % 3 + 0.5)]
-				twidth = out.MeasureString(crit.arttrait, capfont).Width
-				@draw_block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height,
+				twidth = TR.MeasureText(crit.arttrait, traitfont).Width * 0.96
+				@draw_block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height * 0.7,
 					cappen, new SolidBrush Color.FromArgb(200, 40, 40, 40)
-				@print_centered out,crit.arttrait, capfont, xoff, yoff, Color.FromArgb(255, 160, 160, 160)			
+				@print_centered out, crit.arttrait, traitfont, xoff, yoff, Color.FromArgb(255, 160, 160, 160)			
 		return result
 
 	save: (dest) =>		
