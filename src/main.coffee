@@ -9,40 +9,55 @@ clr = require('clr').init assemblies: ['System','mscorlib','System.Drawing','Sys
 Object.assign global, namespace for namespace in [System.Drawing]
 
 #.{ [Classes]
-# -------------------	
-class Lineup
-	_cache = "cache.txt"
+class SiralimData
+	source_cache = "cache.txt"
 
 	# --Methods goes here.
-	constructor: (src, pipe, show_off, dest) ->
-		@bmp = show_off Lineup.render pipe Lineup.parse_export src
-		if dest? then Lineup.save(@bmp, dest)
-		System.Windows.Clipboard.SetData System.Windows.Forms.DataFormats.Bitmap, @bmp
+	constructor:  (src = System.IO.File.ReadAllText source_cache) ->
+		# Main parser.
+		feed = src.split('\r\n')#.filter((x) => x.trim() != "")
+		if feed[0] is '========== CHARACTER ==========' # If header is valid...
+			System.IO.File.WriteAllText source_cache, src, System.Text.Encoding.ASCII
+			# Parsing player section.
+			@player = @player_data feed.splice(1, feed.indexOf("========== CREATURES ==========")-1)
+			# Parsing creature sections.
+			@team = (@crit_data line.split(' ') for line in feed when line.startsWith 'Level ')
+		else throw new Error "Invalid export data provided."
 
-	@load_sprite: (crit_name) =>
-		try return new Bitmap("res\\#{name}.png")
+	player_data: (fragment) ->
+		[naming, spec] = fragment[0].split(', ').map((x) -> x.split ' ')
+		gender: naming[0]
+		name:	naming[1]
+		level:	spec[1]
+		class:	spec[2]
+
+	crit_data: (chunks) ->
+		nether: if chunks[chunks.length-1] == '(Nether)' then chunks.pop(); nether = true else false
+		level:	chunks[1]
+		name:	name = chunks[2..].join(' ')
+		sprite:	@load_sprite(name)
+
+	load_sprite: (crit_name) ->
+		cache_file = "res\\#{crit_name}.png"
+		try return new Bitmap cache_file
 		client = new System.Net.WebClient()
 		stream = client.
 			OpenRead "https://raw.githubusercontent.com/Guevara-chan/SiraLime/master/res/#{encodeURI crit_name}.png"
-		return new Bitmap(stream)
+		bmp = new Bitmap(stream)
+		bmp.Save(cache_file, Imaging.ImageFormat.Png)
+		return bmp
+# -------------------	
+class Lineup
+	# --Methods goes here.
+	constructor: (src, pipe, show_off, dest) ->
+		@bmp = show_off Lineup.render pipe new SiralimData src
+		if dest? then Lineup.save(@bmp, dest)
+		System.Windows.Clipboard.SetData System.Windows.Forms.DataFormats.Bitmap, @bmp
 
-	@parse_export: (src = System.IO.File.ReadAllText _cache) =>
-		# Aux procedures.
-		crit_data = (chunks) =>
-			if chunks[chunks.length-1] == '(Nether)' then chunks.pop()
-			level:	chunks[1]
-			name:	name = chunks[2..].join(' ')
-			sprite:	Lineup.load_sprite(name)#
-		# Main parser.
-		feed = src.split('\r\n')
-		if feed[0] is '========== CHARACTER ==========' # If header is valid...
-			System.IO.File.WriteAllText _cache, src, System.Text.Encoding.ASCII
-			(crit_data(line.split(' ')) for line in feed when line.startsWith 'Level ')
-		else throw new Error "Invalid export data provided."
-
-	@render: (creatures, scale = 2) =>
+	@render: (s3data, scale = 2) =>
 		# Init setup.
-		grid	= {xres: creatures[0].sprite.Width * scale, yres: creatures[0].sprite.Height * scale, caption: 25}
+		{team}	= s3data
+		grid	= {xres: team[0].sprite.Width * scale, yres: team[0].sprite.Height * scale, caption: 25}
 		result	= new Bitmap grid.xres * 3, (grid.yres + grid.caption) * 2
 		out		= Graphics.FromImage(result)
 		capfont	= new Font("Sylfaen", 5.5 * scale)
@@ -56,7 +71,7 @@ class Lineup
 		out.DrawImage new Bitmap("res\\bg.jpg"), 0, 0, result.Width, result.Height
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
 		# Actual drawing.
-		for crit, idx in creatures # Drawing each creaure to canvas.
+		for crit, idx in team # Drawing each creaure to canvas.
 			[x, y] = [(idx % 3) * grid.xres, (idx // 3) * (grid.yres + grid.caption)]
 			# Sprite drawing.
 			out.SmoothingMode = Drawing2D.SmoothingMode.None
@@ -80,11 +95,14 @@ class CUI
 		System.Console.Title = ".[SiraLime]."
 		@say header, "green"
 
-	pipe: (creatures) ->
-		@say "┌", 'white', "#{creatures.length} creatures parsed:", 'cyan'
-		@say("├>", 'white', "#{crit.name}", 'darkGray') for crit in creatures
+	pipe: (s3data) ->
+		{team, player} = s3data
+		@say "┌", 'white', 
+			"#{team.length} creatures for #{player.gender} #{player.name} 
+			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
+		@say("├>", 'white', "#{crit.name}", 'darkGray') for crit in team
 		@say "└", 'white', "Generating teamcard...", 'yellow'
-		return creatures
+		return s3data
 
 	show_off: (img) ->
 		@say("\nWork complete: image succesfully pasted to clipboard !", 'green')
@@ -112,7 +130,7 @@ class CUI
 ui = new CUI
 try
 	System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-	feed = undefined unless try Lineup.parse_export feed=System.Windows.Clipboard.GetText()
+	feed = undefined unless try new SiralimData feed=System.Windows.Clipboard.GetText()
 	new Lineup(feed, ui.pipe.bind(ui), ui.show_off.bind(ui), "last.png")
 catch ex
 	ui.fail(ex)
