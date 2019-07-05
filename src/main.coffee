@@ -33,7 +33,6 @@ class SiralimData
 		class:	spec[2]
 
 	crit_data: (fragment) ->
-		console.log fragment
 		[naming, typing] = fragment.map (x) -> x.split ' '
 		nether: if naming[naming.length-1] == '(Nether)' then naming.pop(); nether = true else false
 		name:	name = naming[2..].join(' ')
@@ -53,20 +52,27 @@ class SiralimData
 		return bmp
 # -------------------	
 class Lineup
+	color_code:
+		Death:	Color.Magenta
+		Chaos:	Color.Crimson 
+		Nature:	Color.Chartreuse #FromArgb(255, 31, 78, 47)
+		Life:	Color.GhostWhite
+		Sorcery:Color.Cyan
+
 	# --Methods goes here.
 	constructor: (src, pipe, show_off, dest) ->
-		@bmp = show_off Lineup.render pipe new SiralimData src
+		@bmp = show_off @render pipe new SiralimData src
 		if dest? then Lineup.save(@bmp, dest)
 		System.Windows.Clipboard.SetData System.Windows.Forms.DataFormats.Bitmap, @bmp
 
-	@render: (s3data, scale = 2) =>
+	render: (s3data, scale = 2) =>
 		# Init setup.
 		{team}	= s3data
 		grid	= {xres: team[0].sprite.Width * scale, yres: team[0].sprite.Height * scale, caption: 25}
 		result	= new Bitmap grid.xres * 3, (grid.yres + grid.caption) * 2
 		out		= Graphics.FromImage(result)
 		capfont	= new Font("Sylfaen", 5.5 * scale)
-		cappen	= new Pen(System.Drawing.Color.FromArgb(255, 10, 10, 10), 2)
+		cappen	= new Pen(System.Drawing.Color.FromArgb(10, 10, 10), 2)
 		rbrush	= new SolidBrush(System.Drawing.Color.FromArgb(210, 40, 40, 40))
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
 		out.InterpolationMode	= System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor
@@ -88,13 +94,20 @@ class Lineup
 			[cap.x,cap.y] = [x + (grid.xres-cap.width) / 2, y + grid.yres]
 			out.FillRectangle(rbrush, cap.x, cap.y, cap.width, cap.height)
 			out.DrawRectangle(cappen, cap.x, cap.y, cap.width, cap.height)
-			System.Windows.Forms.TextRenderer.DrawText(out,text,capfont,new Point(cap.x,cap.y), Color.GhostWhite)
+			System.Windows.Forms.TextRenderer.DrawText(out,text,capfont,new Point(cap.x,cap.y), @color_code[crit.class])
 		return result
 
 	@save: (lineup, dest = "Team.png") =>
 		lineup.Save(dest, Imaging.ImageFormat.Png)
 # -------------------
 class CUI
+	color_code:
+		Death:	"darkMagenta"
+		Chaos:	"darkRed"
+		Nature:	"darkGreen"
+		Life:	"gray"
+		Sorcery:"darkCyan"
+
 	# --Methods goes here.
 	constructor: () ->
 		System.Console.Title = ".[SiraLime]."
@@ -105,7 +118,7 @@ class CUI
 		@say "┌", 'white', 
 			"#{team.length} creatures for #{player.gender} #{player.name} 
 			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
-		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", 'darkGray') for crit in team
+		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class]) for crit in team
 		@say "└", 'white', "Generating teamcard...", 'yellow'
 		return s3data
 
