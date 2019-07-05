@@ -79,7 +79,11 @@ class Lineup
 	render: (s3data, scale = 2) =>
 		# Init setup.
 		{player, team}	= s3data
-		grid	= {xres: team[0].sprite.Width * scale, yres: team[0].sprite.Height * scale, caption: 25, header: 25}
+		grid =
+			xres: team[0].sprite.Width * scale
+			yres: team[0].sprite.Height * scale
+			caption: 22.5 * scale
+			header: 12.5 * scale
 		result	= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
 		out		= Graphics.FromImage(result)
 		capfont	= new Font("Sylfaen", 5.5 * scale)
@@ -106,13 +110,19 @@ class Lineup
 			out.SmoothingMode = Drawing2D.SmoothingMode.None
 			out.DrawImage crit.sprite, x, y, grid.xres, grid.yres
 			out.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-			# Caption drawing.
+			# Name drawing.
 			text = "#{crit.name}"#" lvl#{crit.level}"
 			cap	= {width: out.MeasureString(text, capfont).Width, height: out.MeasureString(text, capfont).Height}
 			[cap.x,cap.y] = [x + (grid.xres-cap.width) / 2, y + grid.yres]
-			out.FillRectangle new SolidBrush(@set_alpha @color_code[crit.class],30), cap.x, cap.y, cap.width, cap.height
-			out.DrawRectangle(cappen, cap.x, cap.y, cap.width, cap.height)
+			@draw_block out,cap.x,cap.y,cap.width,cap.height,cappen,new SolidBrush @set_alpha @color_code[crit.class],30
 			@print_centered out, text, capfont, grid.xres * (idx % 3 + 0.5) , cap.y, @color_code[crit.class]
+			# Additional trait drawing.
+			if crit.arttrait
+				[yoff, xoff, twidth] = [cap.y+cap.height, grid.xres * (idx % 3 + 0.5)]
+				twidth = out.MeasureString(crit.arttrait, capfont).Width
+				@draw_block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height,
+					cappen, new SolidBrush Color.FromArgb(200, 40, 40, 40)
+				@print_centered out,crit.arttrait, capfont, xoff, yoff, Color.FromArgb(255, 160, 160, 160)			
 		return result
 
 	save: (dest) =>		
