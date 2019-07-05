@@ -80,15 +80,15 @@ class Lineup
 		# Init setup.
 		{player, team}	= s3data
 		grid =
-			xres: team[0].sprite.Width * scale
-			yres: team[0].sprite.Height * scale
-			caption: 18.5 * scale
-			header: 12.5 * scale
+			xres:	scale * team[0].sprite.Width
+			yres:	scale * team[0].sprite.Height
+			caption:scale * 18.5
+			header:	scale * 12.5
 		result		= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
 		out			= Graphics.FromImage(result)
-		capfont		= new Font("Sylfaen", 5.5 * scale)
-		traitfont	= new Font("Sylfaen", 4.5 * scale)
-		hdrfont		= new Font("Sylfaen", 6 * scale, FontStyle.Bold)
+		capfont		= new Font("Sylfaen", scale * 5.5)
+		traitfont	= new Font("Sylfaen", scale * 4.5)
+		hdrfont		= new Font("Sylfaen", scale * 6, FontStyle.Bold)
 		cappen		= new Pen(System.Drawing.Color.FromArgb(10, 10, 10), 2)
 		rbrush		= new SolidBrush(System.Drawing.Color.FromArgb(210, 40, 40, 40))
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
