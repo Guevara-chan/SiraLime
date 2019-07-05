@@ -154,7 +154,7 @@ class CUI
 		return s3data
 
 	show_off: (img) ->
-		@say("\nWork complete: image succesfully pasted to clipboard !", 'green')
+		@say("\nWork complete: image successfully pasted to clipboard !", 'green')
 		return img
 
 	done: () ->
