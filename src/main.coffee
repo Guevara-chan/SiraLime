@@ -55,7 +55,7 @@ class Lineup
 	color_code:
 		Death:	Color.Magenta
 		Chaos:	Color.Crimson 
-		Nature:	Color.Chartreuse #FromArgb(255, 31, 78, 47)
+		Nature:	Color.Chartreuse
 		Life:	Color.GhostWhite
 		Sorcery:Color.Cyan
 
@@ -65,13 +65,21 @@ class Lineup
 		if dest? then Lineup.save(@bmp, dest)
 		System.Windows.Clipboard.SetData System.Windows.Forms.DataFormats.Bitmap, @bmp
 
+	print_centered: (out, txt, font, x, y, color) ->
+		System.Windows.Forms.TextRenderer.DrawText out, txt, font, 
+			new Point(x - (out.MeasureString(txt, font).Width / 2), y), color
+
+	set_alpha: (color, a = 40) ->
+		Color.FromArgb(a, color.R, color.G, color.B)
+
 	render: (s3data, scale = 2) =>
 		# Init setup.
-		{team}	= s3data
-		grid	= {xres: team[0].sprite.Width * scale, yres: team[0].sprite.Height * scale, caption: 25}
-		result	= new Bitmap grid.xres * 3, (grid.yres + grid.caption) * 2
+		{player, team}	= s3data
+		grid	= {xres: team[0].sprite.Width * scale, yres: team[0].sprite.Height * scale, caption: 25, header: 25}
+		result	= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
 		out		= Graphics.FromImage(result)
 		capfont	= new Font("Sylfaen", 5.5 * scale)
+		hdrfont	= new Font("Sylfaen", 6 * scale, FontStyle.Bold)
 		cappen	= new Pen(System.Drawing.Color.FromArgb(10, 10, 10), 2)
 		rbrush	= new SolidBrush(System.Drawing.Color.FromArgb(210, 40, 40, 40))
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
@@ -81,9 +89,13 @@ class Lineup
 		bgpen.DashStyle	= Drawing2D.DashStyle.Dash
 		out.DrawImage new Bitmap("res\\bg.jpg"), 0, 0, result.Width, result.Height
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
-		# Actual drawing.
+		# Header drawing.
+		out.FillRectangle new SolidBrush(@set_alpha @color_code[player.class]), 0, 0, grid.xres, grid.header-3
+		out.DrawRectangle bgpen, 0, 0, grid.xres, grid.header-3
+		@print_centered out, "#{player.gender} #{player.name}", hdrfont, grid.xres / 2, 0, Color.Coral
+		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
-			[x, y] = [(idx % 3) * grid.xres, (idx // 3) * (grid.yres + grid.caption)]
+			[x, y] = [(idx % 3) * grid.xres, grid.header + (idx // 3) * (grid.yres + grid.caption)]
 			# Sprite drawing.
 			out.SmoothingMode = Drawing2D.SmoothingMode.None
 			out.DrawImage crit.sprite, x, y, grid.xres, grid.yres
@@ -92,9 +104,9 @@ class Lineup
 			text = "#{crit.name}"#" lvl#{crit.level}"
 			cap	= {width: out.MeasureString(text, capfont).Width, height: out.MeasureString(text, capfont).Height}
 			[cap.x,cap.y] = [x + (grid.xres-cap.width) / 2, y + grid.yres]
-			out.FillRectangle(rbrush, cap.x, cap.y, cap.width, cap.height)
+			out.FillRectangle new SolidBrush(@set_alpha @color_code[crit.class],30), cap.x, cap.y, cap.width, cap.height
 			out.DrawRectangle(cappen, cap.x, cap.y, cap.width, cap.height)
-			System.Windows.Forms.TextRenderer.DrawText(out,text,capfont,new Point(cap.x,cap.y), @color_code[crit.class])
+			@print_centered out,text, capfont, grid.xres / 2 + (idx % 3) * grid.xres, cap.y, @color_code[crit.class]
 		return result
 
 	@save: (lineup, dest = "Team.png") =>
@@ -116,7 +128,7 @@ class CUI
 	pipe: (s3data) ->
 		{team, player} = s3data
 		@say "┌", 'white', 
-			"#{team.length} creatures for #{player.gender} #{player.name} 
+			"#{team.length} creatures of #{player.gender} #{player.name} 
 			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
 		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class]) for crit in team
 		@say "└", 'white', "Generating teamcard...", 'yellow'
