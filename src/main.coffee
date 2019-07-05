@@ -69,6 +69,10 @@ class Lineup
 		System.Windows.Forms.TextRenderer.DrawText out, txt, font, 
 			new Point(x - (out.MeasureString(txt, font).Width / 2), y), color
 
+	draw_block: (out, x, y, width, height, pen, brush) ->
+		out.FillRectangle brush, x, y, width, height
+		out.DrawRectangle pen, x, y, width, height
+
 	set_alpha: (color, a = 40) ->
 		Color.FromArgb(a, color.R, color.G, color.B)
 
@@ -90,9 +94,11 @@ class Lineup
 		out.DrawImage new Bitmap("res\\bg.jpg"), 0, 0, result.Width, result.Height
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
 		# Header drawing.
-		out.FillRectangle new SolidBrush(@set_alpha @color_code[player.class]), 0, 0, grid.xres, grid.header-3
-		out.DrawRectangle bgpen, 0, 0, grid.xres, grid.header-3
-		@print_centered out, "#{player.gender} #{player.name}", hdrfont, grid.xres / 2, 0, Color.Coral
+		hdrbrush = new SolidBrush(@set_alpha @color_code[player.class])
+		@draw_block out, 0, 0, grid.xres, grid.header-3, bgpen, hdrbrush
+		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header-3, bgpen, hdrbrush 
+		@print_centered out, "#{player.gender} #{player.name}", hdrfont, grid.xres * 0.5, 0, Color.Coral
+		@print_centered out, "lvl#{player.level}|#{player.class}", hdrfont, grid.xres * 2.5, 0,@color_code[player.class]
 		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
 			[x, y] = [(idx % 3) * grid.xres, grid.header + (idx // 3) * (grid.yres + grid.caption)]
@@ -106,7 +112,7 @@ class Lineup
 			[cap.x,cap.y] = [x + (grid.xres-cap.width) / 2, y + grid.yres]
 			out.FillRectangle new SolidBrush(@set_alpha @color_code[crit.class],30), cap.x, cap.y, cap.width, cap.height
 			out.DrawRectangle(cappen, cap.x, cap.y, cap.width, cap.height)
-			@print_centered out,text, capfont, grid.xres / 2 + (idx % 3) * grid.xres, cap.y, @color_code[crit.class]
+			@print_centered out, text, capfont, grid.xres * (idx % 3 + 0.5) , cap.y, @color_code[crit.class]
 		return result
 
 	@save: (lineup, dest = "Team.png") =>
