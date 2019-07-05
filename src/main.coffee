@@ -15,26 +15,31 @@ class SiralimData
 	# --Methods goes here.
 	constructor:  (src = System.IO.File.ReadAllText source_cache) ->
 		# Main parser.
-		feed = src.split('\r\n')#.filter((x) => x.trim() != "")
+		feed = src.split('\r\n')
 		if feed[0] is '========== CHARACTER ==========' # If header is valid...
 			System.IO.File.WriteAllText source_cache, src, System.Text.Encoding.ASCII
 			# Parsing player section.
-			@player = @player_data feed.splice(1, feed.indexOf("========== CREATURES ==========")-1)
+			@player = @player_data feed.splice(1, feed.indexOf "========== CREATURES ==========")
 			# Parsing creature sections.
-			@team = (@crit_data line.split(' ') for line in feed when line.startsWith 'Level ')
+			@team = while feed.length > 2
+				@crit_data feed.splice(1, 1 + feed.indexOf "------------------------------")
 		else throw new Error "Invalid export data provided."
 
 	player_data: (fragment) ->
-		[naming, spec] = fragment[0].split(', ').map((x) -> x.split ' ')
+		[naming, spec] = fragment[0].split(', ').map (x) -> x.split ' '
 		gender: naming[0]
 		name:	naming[1]
 		level:	spec[1]
 		class:	spec[2]
 
-	crit_data: (chunks) ->
-		nether: if chunks[chunks.length-1] == '(Nether)' then chunks.pop(); nether = true else false
-		level:	chunks[1]
-		name:	name = chunks[2..].join(' ')
+	crit_data: (fragment) ->
+		console.log fragment
+		[naming, typing] = fragment.map (x) -> x.split ' '
+		nether: if naming[naming.length-1] == '(Nether)' then naming.pop(); nether = true else false
+		name:	name = naming[2..].join(' ')
+		level:	naming[1]
+		kind:	typing[0..typing.length-3].join ' '
+		class:	typing[typing.length-1]
 		sprite:	@load_sprite(name)
 
 	load_sprite: (crit_name) ->
@@ -100,7 +105,7 @@ class CUI
 		@say "┌", 'white', 
 			"#{team.length} creatures for #{player.gender} #{player.name} 
 			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
-		@say("├>", 'white', "#{crit.name}", 'darkGray') for crit in team
+		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", 'darkGray') for crit in team
 		@say "└", 'white', "Generating teamcard...", 'yellow'
 		return s3data
 
