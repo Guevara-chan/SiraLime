@@ -27,8 +27,8 @@ class SiralimData
 
 	player_data: (fragment) ->
 		[naming, spec] = fragment[0].split(', ').map (x) -> x.split ' '
-		gender: naming[0]
-		name:	naming[1]
+		title:	naming[0..naming.length-2].join(' ')
+		name:	naming[naming.length-1]
 		level:	spec[1]
 		class:	spec[2]
 		runes:	fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
@@ -93,7 +93,8 @@ class Lineup
 		out			= Graphics.FromImage(result)
 		capfont		= new Font "Sylfaen", scale * 5.5
 		traitfont	= new Font "Sylfaen", scale * 4.5
-		hdrfont		= new Font "Sylfaen", scale * 6, FontStyle.Bold
+		hdrfont		= new Font "Sylfaen", scale * 5.5, FontStyle.Bold
+		subhdrfont	= new Font "Palatino Linotype", scale * 4, FontStyle.Bold
 		cappen		= new Pen @grayscale(10), 2
 		rbrush		= new SolidBrush @grayscale(40, 210)
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
@@ -106,11 +107,12 @@ class Lineup
 		# Header drawing.
 		hdrbrush = new SolidBrush(@set_alpha @color_code[player.class])
 		@draw_block out, 0, 0, grid.xres, grid.header-3, bgpen, new SolidBrush(@set_alpha @color_code[player.class])
-		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header-3, bgpen, hdrbrush 
-		@print_centered out, "#{player.gender} #{player.name}", hdrfont, grid.xres * 0.5, 0, Color.Coral
-		@print_centered out, 
-			"lvl#{if player.level > 9999 then player.level // 1000 + "K" else player.level}|#{player.class}", 
-				hdrfont, grid.xres * 2.5, 0,@color_code[player.class]
+		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header - 1.5 * scale, bgpen, hdrbrush 
+		@print_centered out, "#{player.name}", hdrfont,	grid.xres * 0.5, -1.5 * scale, Color.Coral
+		@print_centered out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.35+1, Color.Chocolate
+		@print_centered out, "#{player.class}", subhdrfont, grid.xres * 2.5, -1.5 * scale, 
+			Color.FromArgb((color = @color_code[player.class]).R * 0.85, color.G  * 0.85, color.B  * 0.85)
+		@print_centered out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.25, @color_code[player.class]
 		# Runes drawing.
 		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -2, @grayscale 135
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
@@ -124,7 +126,7 @@ class Lineup
 			if crit.nether
 				out.FillEllipse new SolidBrush(@set_alpha @color_code[crit.class], 110), 
 					x + 2.75 * scale, y + 3 * scale, 5 * scale, 5.5 * scale
-				TR.DrawText out, "★", hdrfont, new Point(x, y), @color_code[crit.class]
+				TR.DrawText out, "★", new Font("Sylfaen",scale*6,FontStyle.Bold),new Point(x,y),@color_code[crit.class]
 			# Name drawing.
 			text = "#{crit.name}"#" lvl#{crit.level}"
 			cap	= {width: (TR.MeasureText(text, capfont)).Width*0.93, height: (TR.MeasureText(text, capfont)).Height}
@@ -161,7 +163,7 @@ class CUI
 	pipe: (s3data) ->
 		{team, player} = s3data
 		@say "┌", 'white', 
-			"#{@plural 'creature', team.length} of #{player.gender} #{player.name} 
+			"#{@plural 'creature', team.length} of #{player.title} #{player.name} 
 			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
 		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then '[N]' else ''), 'white', 
