@@ -141,6 +141,7 @@ class CUI
 
 	# --Methods goes here.
 	constructor: () ->
+		[@fg, @bg] = [ System.Console.ForegroundColor,  System.Console.BackgroundColor]
 		System.Console.Title = ".[SiraLime]."
 		@say header, "green"
 
@@ -158,9 +159,6 @@ class CUI
 		@say("\nWork complete: image successfully pasted to clipboard !", 'green')
 		return img
 
-	done: () ->
-		System.Threading.Thread.Sleep(3000)
-
 	capitalize: (txt) ->
 		txt[0].toUpperCase() + txt[1..]#.toLowerCase()
 	
@@ -174,6 +172,10 @@ class CUI
 
 	fail: (ex) ->
 		@say "FAIL:: #{ex}", 'red'
+
+	done: () ->
+		[System.Console.ForegroundColor, System.Console.BackgroundColor] = [@fg, @bg]
+		System.Threading.Thread.Sleep(3000)
 #.}
 
 # --Main code--
