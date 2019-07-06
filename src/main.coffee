@@ -150,8 +150,9 @@ class CUI
 		@say "┌", 'white', 
 			"#{@plural 'creature', team.length} of #{player.gender} #{player.name} 
 			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
-		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class}) ", 
-			@color_code[crit.class], (if crit.arttrait then "/" else "") + crit.arttrait, 'darkGray') for crit in team
+		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
+			(if crit.nether then '[N]' else ''), 'white', 
+				(if crit.arttrait then " /" else "") + crit.arttrait, 'darkGray') for crit in team
 		@say "└", 'white', (if player.runes then player.runes.join('/') else "No") +
 			"#{@plural 'rune', player.runes.length, false} equipped.", 'yellow'
 		return s3data
