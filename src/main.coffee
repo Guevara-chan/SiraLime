@@ -148,7 +148,7 @@ class CUI
 	pipe: (s3data) ->
 		{team, player} = s3data
 		@say "┌", 'white', 
-			"#{team.length} creatures of #{player.gender} #{player.name} 
+			"#{@plural 'creature', team.length} of #{player.gender} #{player.name} 
 			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
 		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class}) ", 
 			@color_code[crit.class], (if crit.arttrait then "/" else "") + crit.arttrait, 'darkGray') for crit in team
@@ -161,6 +161,9 @@ class CUI
 
 	capitalize: (txt) ->
 		txt[0].toUpperCase() + txt[1..]#.toLowerCase()
+
+	plural: (word, num, concat = true) ->
+		"#{if concat then num else ''} #{word}#{if num == 1 then '' else 's'}"
 	
 	say: (txt, color) ->
 		arg = 0
