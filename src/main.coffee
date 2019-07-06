@@ -45,7 +45,6 @@ class SiralimData
 		arttrait:	(fragment.find((x) -> x.startsWith 'Trait: ')?.split(' ')[1..].join(' ')) ? ""
 
 	load_sprite: (crit_name) ->
-		console.log crit_name
 		cache_file = "res\\#{crit_name}.png"
 		try return new Bitmap cache_file
 		client = new System.Net.WebClient()
@@ -126,10 +125,10 @@ class Lineup
 				TR.DrawText out, "★", hdrfont, new Point(x, y), @color_code[crit.class]
 			# Name drawing.
 			text = "#{crit.name}"#" lvl#{crit.level}"
-			cap	= {width: (TR.MeasureText(text, capfont)).Width, height: (TR.MeasureText(text, capfont)).Height}
+			cap	= {width: (TR.MeasureText(text, capfont)).Width*0.93, height: (TR.MeasureText(text, capfont)).Height}
 			[cap.x,cap.y] = [x + (grid.xres-cap.width) / 2, y + grid.yres]
 			@draw_block out,cap.x,cap.y,cap.width,cap.height,cappen,new SolidBrush @set_alpha @color_code[crit.class],30
-			@print_centered out, text, capfont, grid.xres * (idx % 3 + 0.5) , cap.y, @color_code[crit.class]
+			@print_centered out, text, capfont, grid.xres * (idx % 3 + 0.5), cap.y, @color_code[crit.class]
 			# Additional trait drawing.
 			if crit.arttrait
 				[yoff, xoff, twidth] = [cap.y+cap.height, grid.xres * (idx % 3 + 0.5)]
