@@ -178,8 +178,8 @@ class CUI
 	pipe: (s3data) ->
 		{team, player} = s3data
 		@say "┌", 'white', 
-			"#{@plural 'creature', team.length} of #{player.title} #{player.name} 
-			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
+			"#{@plural 'creature', team.length} of #{player.title} #{player.name}
+			(lv#{player.level}|#{player.class})/#{player.played}#{player.achievs.split(' ')[-1..-1][0]} parsed:",'cyan'
 		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then '[N]' else ''), 'white', 
 				(if crit.arttrait then " /" else "") + crit.arttrait, 'darkGray') for crit in team
