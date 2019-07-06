@@ -31,6 +31,7 @@ class SiralimData
 		name:	naming[1]
 		level:	spec[1]
 		class:	spec[2]
+		runes:	fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
 
 	crit_data: (fragment) ->
 		[naming, typing] = fragment.map (x) -> x.split ' '
@@ -150,7 +151,7 @@ class CUI
 			(lv#{player.level}|#{player.class}) parsed:", 'cyan'
 		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class}) ", 
 			@color_code[crit.class], (if crit.arttrait then "/" else "") + crit.arttrait, 'darkGray') for crit in team
-		@say "└", 'white', "Generating teamcard...", 'yellow'
+		@say "└", 'white', (if player.runes then player.runes.join('/') else "No") + " runes equipped.", 'yellow'
 		return s3data
 
 	show_off: (img) ->
