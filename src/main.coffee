@@ -69,7 +69,7 @@ class Lineup
 		@save(dest)
 
 	print_centered: (out, txt, font, x, y, color) ->
-		TR.DrawText out, txt, font, new Point(x - (TR.MeasureText(txt, font).Width / 2), y), color
+		TR.DrawText out, txt, font, new Point(x - (TR.MeasureText(txt, font).Width / 2)+1, y), color
 
 	draw_block: (out, x, y, width, height, pen, brush) ->
 		out.FillRectangle brush, x, y, width, height
@@ -108,7 +108,9 @@ class Lineup
 		@draw_block out, 0, 0, grid.xres, grid.header-3, bgpen, new SolidBrush(@set_alpha @color_code[player.class])
 		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header-3, bgpen, hdrbrush 
 		@print_centered out, "#{player.gender} #{player.name}", hdrfont, grid.xres * 0.5, 0, Color.Coral
-		@print_centered out, "lvl#{player.level}|#{player.class}", hdrfont, grid.xres * 2.5, 0,@color_code[player.class]
+		@print_centered out, 
+			"lvl#{if player.level > 9999 then player.level // 1000 + "K" else player.level}|#{player.class}", 
+				hdrfont, grid.xres * 2.5, 0,@color_code[player.class]
 		# Runes drawing.
 		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -2, @grayscale 135
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
