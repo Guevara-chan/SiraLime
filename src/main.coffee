@@ -78,10 +78,15 @@ class Lineup
 	set_alpha: (color, a = 40) ->
 		Color.FromArgb(a, color.R, color.G, color.B)
 
-	grayscale: (level, a = 255) =>
+	grayscale: (level, a = 255) ->
 		Color.FromArgb(a, level, level, level)
 
-	render: (s3data, scale = 2) =>
+
+	render: (s3data, scale = 2) ->
+		# Aux procedure.
+		make_font = (family, size, style = FontStyle.Regular) =>
+			#console.log size
+			new Font family, scale * size, style, System.Drawing.GraphicsUnit.Pixel
 		# Init setup.
 		{player, team}	= s3data
 		grid =
@@ -91,10 +96,10 @@ class Lineup
 			header:	scale * 15
 		result		= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
 		out			= Graphics.FromImage(result)
-		capfont		= new Font "Sylfaen", scale * 5.5
-		traitfont	= new Font "Sylfaen", scale * 4.5
-		hdrfont		= new Font "Impact", scale * 5.5
-		subhdrfont	= new Font "Impact", scale * 4
+		capfont		= make_font "Sylfaen", 7.5
+		traitfont	= make_font "Sylfaen", 6.5
+		hdrfont		= make_font "Impact", 7.5
+		subhdrfont	= make_font "Impact", 6
 		cappen		= new Pen @grayscale(10), 2
 		rbrush		= new SolidBrush @grayscale(40, 210)
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
@@ -114,7 +119,7 @@ class Lineup
 			Color.FromArgb((color = @color_code[player.class]).R * 0.85, color.G * 0.85, color.B * 0.85)
 		@print_centered out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.32, @color_code[player.class]
 		# Runes drawing.
-		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -2, @grayscale 135
+		@print_centered out, player.runes.join('|'), make_font("Sylfaen", 7), grid.xres * 1.5, -2, @grayscale 135
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
 		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
@@ -126,7 +131,7 @@ class Lineup
 			if crit.nether
 				out.FillEllipse new SolidBrush(@set_alpha @color_code[crit.class], 110), 
 					x + 2.75 * scale, y + 3 * scale, 5 * scale, 5.5 * scale
-				TR.DrawText out, "★", new Font("Sylfaen",scale*6,FontStyle.Bold),new Point(x,y),@color_code[crit.class]
+				TR.DrawText out, "★", make_font("Sylfaen",8,FontStyle.Bold),new Point(x,y),@color_code[crit.class]
 			# Name drawing.
 			text = "#{crit.name}"#" lvl#{crit.level}"
 			cap	= {width: (TR.MeasureText(text, capfont)).Width*0.93, height: (TR.MeasureText(text, capfont)).Height}
