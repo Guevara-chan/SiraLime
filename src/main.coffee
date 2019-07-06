@@ -1,6 +1,6 @@
 header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-	# SiraLime teamcards renderer v0.2
+	# SiraLime teamcards renderer v0.25
 	# Developed in 2019 by Guevara-chan
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
@@ -110,7 +110,6 @@ class Lineup
 		@print_centered out, "lvl#{player.level}|#{player.class}", hdrfont, grid.xres * 2.5, 0,@color_code[player.class]
 		# Runes drawing.
 		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -2, @grayscale 135
-		#Color.Gray
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
 		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
