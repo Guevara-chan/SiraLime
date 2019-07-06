@@ -115,7 +115,10 @@ class Lineup
 			out.SmoothingMode = Drawing2D.SmoothingMode.None
 			out.DrawImage crit.sprite, x, y, grid.xres, grid.yres
 			out.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-			if crit.nether then TR.DrawText out, "★", hdrfont, new Point(x, y), @color_code[crit.class]
+			if crit.nether
+				out.FillEllipse new SolidBrush(@set_alpha @color_code[crit.class], 110), 
+					x + 2.75 * scale, y + 3 * scale, 5 * scale, 5.5 * scale
+				TR.DrawText out, "★", hdrfont, new Point(x, y), @color_code[crit.class]
 			# Name drawing.
 			text = "#{crit.name}"#" lvl#{crit.level}"
 			cap	= {width: (TR.MeasureText(text, capfont)).Width, height: (TR.MeasureText(text, capfont)).Height}
