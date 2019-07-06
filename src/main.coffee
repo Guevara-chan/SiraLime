@@ -90,12 +90,12 @@ class Lineup
 		capfont		= new Font("Sylfaen", scale * 5.5)
 		traitfont	= new Font("Sylfaen", scale * 4.5)
 		hdrfont		= new Font("Sylfaen", scale * 6, FontStyle.Bold)
-		cappen		= new Pen(System.Drawing.Color.FromArgb(10, 10, 10), 2)
-		rbrush		= new SolidBrush(System.Drawing.Color.FromArgb(210, 40, 40, 40))
+		cappen		= new Pen(Color.FromArgb(10, 10, 10), 2)
+		rbrush		= new SolidBrush(Color.FromArgb(210, 40, 40, 40))
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
-		out.InterpolationMode	= System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor
+		out.InterpolationMode	= Drawing2D.InterpolationMode.NearestNeighbor
 		# BG drawing.
-		bgpen = new Pen(System.Drawing.Color.DarkGray, 1)
+		bgpen			= new Pen(Color.DarkGray, 1)
 		bgpen.DashStyle	= Drawing2D.DashStyle.Dash
 		out.DrawImage new Bitmap("res\\bg.jpg"), 0, 0, result.Width, result.Height
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
@@ -105,6 +105,9 @@ class Lineup
 		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header-3, bgpen, hdrbrush 
 		@print_centered out, "#{player.gender} #{player.name}", hdrfont, grid.xres * 0.5, 0, Color.Coral
 		@print_centered out, "lvl#{player.level}|#{player.class}", hdrfont, grid.xres * 2.5, 0,@color_code[player.class]
+		#########################
+		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -3, Color.Gray
+		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
 		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
 			[x, y] = [(idx % 3) * grid.xres, grid.header + (idx // 3) * (grid.yres + grid.caption)]
