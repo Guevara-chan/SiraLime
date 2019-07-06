@@ -88,13 +88,13 @@ class Lineup
 			xres:	scale * team[0].sprite.Width
 			yres:	scale * team[0].sprite.Height
 			caption:scale * 18.5
-			header:	scale * 12.5
+			header:	scale * 15
 		result		= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
 		out			= Graphics.FromImage(result)
 		capfont		= new Font "Sylfaen", scale * 5.5
 		traitfont	= new Font "Sylfaen", scale * 4.5
-		hdrfont		= new Font "Sylfaen", scale * 5.5, FontStyle.Bold
-		subhdrfont	= new Font "Palatino Linotype", scale * 4, FontStyle.Bold
+		hdrfont		= new Font "Impact", scale * 5.5
+		subhdrfont	= new Font "Impact", scale * 4
 		cappen		= new Pen @grayscale(10), 2
 		rbrush		= new SolidBrush @grayscale(40, 210)
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
@@ -108,11 +108,11 @@ class Lineup
 		hdrbrush = new SolidBrush(@set_alpha @color_code[player.class])
 		@draw_block out, 0, 0, grid.xres, grid.header-3, bgpen, new SolidBrush(@set_alpha @color_code[player.class])
 		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header - 1.5 * scale, bgpen, hdrbrush 
-		@print_centered out, "#{player.name}", hdrfont,	grid.xres * 0.5, -1.5 * scale, Color.Coral
-		@print_centered out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.35+1, Color.Chocolate
-		@print_centered out, "#{player.class}", subhdrfont, grid.xres * 2.5, -1.5 * scale, 
-			Color.FromArgb((color = @color_code[player.class]).R * 0.85, color.G  * 0.85, color.B  * 0.85)
-		@print_centered out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.25, @color_code[player.class]
+		@print_centered out, "#{player.name}", hdrfont,	grid.xres * 0.5, -scale, Color.Coral
+		@print_centered out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.4, Color.Chocolate
+		@print_centered out, "#{player.class} Mage", subhdrfont, grid.xres * 2.5, -scale, 
+			Color.FromArgb((color = @color_code[player.class]).R * 0.85, color.G * 0.85, color.B * 0.85)
+		@print_centered out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.32, @color_code[player.class]
 		# Runes drawing.
 		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -2, @grayscale 135
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
