@@ -115,6 +115,7 @@ class Lineup
 			out.SmoothingMode = Drawing2D.SmoothingMode.None
 			out.DrawImage crit.sprite, x, y, grid.xres, grid.yres
 			out.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+			if crit.nether then TR.DrawText out, "★", hdrfont, new Point(x, y), @color_code[crit.class]
 			# Name drawing.
 			text = "#{crit.name}"#" lvl#{crit.level}"
 			cap	= {width: (TR.MeasureText(text, capfont)).Width, height: (TR.MeasureText(text, capfont)).Height}
