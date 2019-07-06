@@ -105,8 +105,8 @@ class Lineup
 		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header-3, bgpen, hdrbrush 
 		@print_centered out, "#{player.gender} #{player.name}", hdrfont, grid.xres * 0.5, 0, Color.Coral
 		@print_centered out, "lvl#{player.level}|#{player.class}", hdrfont, grid.xres * 2.5, 0,@color_code[player.class]
-		#########################
-		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -3, Color.Gray
+		# Runes drawing.
+		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -2, Color.Gray
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
 		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
