@@ -77,6 +77,9 @@ class Lineup
 	set_alpha: (color, a = 40) ->
 		Color.FromArgb(a, color.R, color.G, color.B)
 
+	grayscale: (level, a = 255) =>
+		Color.FromArgb(a, level, level, level)
+
 	render: (s3data, scale = 2) =>
 		# Init setup.
 		{player, team}	= s3data
@@ -87,15 +90,15 @@ class Lineup
 			header:	scale * 12.5
 		result		= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
 		out			= Graphics.FromImage(result)
-		capfont		= new Font("Sylfaen", scale * 5.5)
-		traitfont	= new Font("Sylfaen", scale * 4.5)
-		hdrfont		= new Font("Sylfaen", scale * 6, FontStyle.Bold)
-		cappen		= new Pen(Color.FromArgb(10, 10, 10), 2)
-		rbrush		= new SolidBrush(Color.FromArgb(210, 40, 40, 40))
+		capfont		= new Font "Sylfaen", scale * 5.5
+		traitfont	= new Font "Sylfaen", scale * 4.5
+		hdrfont		= new Font "Sylfaen", scale * 6, FontStyle.Bold
+		cappen		= new Pen @grayscale(10), 2
+		rbrush		= new SolidBrush @grayscale(40, 210)
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
 		out.InterpolationMode	= Drawing2D.InterpolationMode.NearestNeighbor
 		# BG drawing.
-		bgpen			= new Pen(Color.DarkGray, 1)
+		bgpen			= new Pen Color.DarkGray, 1
 		bgpen.DashStyle	= Drawing2D.DashStyle.Dash
 		out.DrawImage new Bitmap("res\\bg.jpg"), 0, 0, result.Width, result.Height
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
@@ -106,7 +109,8 @@ class Lineup
 		@print_centered out, "#{player.gender} #{player.name}", hdrfont, grid.xres * 0.5, 0, Color.Coral
 		@print_centered out, "lvl#{player.level}|#{player.class}", hdrfont, grid.xres * 2.5, 0,@color_code[player.class]
 		# Runes drawing.
-		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -2, Color.Gray
+		@print_centered out, player.runes.join('|'), new Font("Sylfaen", scale * 5), grid.xres * 1.5, -2, @grayscale 135
+		#Color.Gray
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
 		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
@@ -130,8 +134,8 @@ class Lineup
 				[yoff, xoff, twidth] = [cap.y+cap.height, grid.xres * (idx % 3 + 0.5)]
 				twidth = TR.MeasureText(crit.arttrait, traitfont).Width * 0.96
 				@draw_block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height * 0.7,
-					cappen, new SolidBrush Color.FromArgb(200, 40, 40, 40)
-				@print_centered out, crit.arttrait, traitfont, xoff, yoff, Color.FromArgb(255, 160, 160, 160)			
+					cappen, new SolidBrush @grayscale(40, 200)
+				@print_centered out, crit.arttrait, traitfont, xoff, yoff, @grayscale(160)
 		return result
 
 	save: (dest) =>		
