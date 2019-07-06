@@ -1,6 +1,6 @@
 header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-	# SiraLime teamcards renderer v0.25
+	# SiraLime teamcards renderer v0.3
 	# Developed in 2019 by Guevara-chan
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
@@ -32,6 +32,8 @@ class SiralimData
 		level:	spec[1]
 		class:	spec[2]
 		runes:	fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
+		achievs:fragment[1].split(': ')[1]#.split(' ').join('')
+		played:	fragment[2].split(': ')[1]
 
 	crit_data: (fragment) ->
 		[naming, typing] = fragment.map (x) -> x.split ' '
@@ -81,6 +83,8 @@ class Lineup
 	grayscale: (level, a = 255) ->
 		Color.FromArgb(a, level, level, level)
 
+	saturate: (color, mod = 0.85) ->
+		Color.FromArgb(color.R * mod, color.G * mod, color.B * mod)
 
 	render: (s3data, scale = 2) ->
 		# Aux procedure.
@@ -116,11 +120,17 @@ class Lineup
 		@print_centered out, "#{player.name}", hdrfont,	grid.xres * 0.5, -scale, Color.Coral
 		@print_centered out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.4, Color.Chocolate
 		@print_centered out, "#{player.class} Mage", subhdrfont, grid.xres * 2.5, -scale, 
-			Color.FromArgb((color = @color_code[player.class]).R * 0.85, color.G * 0.85, color.B * 0.85)
+			@saturate @color_code[player.class]
 		@print_centered out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.32, @color_code[player.class]
 		# Runes drawing.
 		@print_centered out, player.runes.join('|'), make_font("Sylfaen", 7), grid.xres * 1.5, -2, @grayscale 135
+		@print_centered out, player.played,make_font("Impact",5.5),grid.xres*1.25,scale*7.5,@saturate Color.Coral,0.5
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
+		# Clock and achievments.
+		@print_centered out, player.achievs.split(" ")[0..-2].join(''), make_font("Impact", 5.5), grid.xres * 1.75, 
+			scale * 7.5, Color.FromArgb(120, 120, 0)
+		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.5, grid.caption * 0.4, grid.xres * 1.5, grid.caption * 0.75
+
 		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
 			[x, y] = [(idx % 3) * grid.xres, grid.header + (idx // 3) * (grid.yres + grid.caption)]
@@ -144,7 +154,7 @@ class Lineup
 				twidth = TR.MeasureText(crit.arttrait, traitfont).Width * 0.96
 				@draw_block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height * 0.7,
 					cappen, new SolidBrush @grayscale(40, 200)
-				@print_centered out, crit.arttrait, traitfont, xoff, yoff, @grayscale(160)
+				@print_centered out, crit.arttrait, traitfont, xoff, yoff-scale, @grayscale(160)
 		return result
 
 	save: (dest) =>		
