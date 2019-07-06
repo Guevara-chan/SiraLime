@@ -35,7 +35,8 @@ class SiralimData
 
 	crit_data: (fragment) ->
 		[naming, typing] = fragment.map (x) -> x.split ' '
-		nether:		if naming[naming.length-1] == '(Nether)' then naming.pop(); nether = true else false
+		singular:	if naming[naming.length-1] == '(Singular)'	then naming.pop(); true else false
+		nether:		if naming[naming.length-1] == '(Nether)'	then naming.pop(); true else false
 		name:		name = naming[2..].join(' ')
 		level:		naming[1]
 		kind:		typing[0..typing.length-3].join ' '
@@ -44,6 +45,7 @@ class SiralimData
 		arttrait:	(fragment.find((x) -> x.startsWith 'Trait: ')?.split(' ')[1..].join(' ')) ? ""
 
 	load_sprite: (crit_name) ->
+		console.log crit_name
 		cache_file = "res\\#{crit_name}.png"
 		try return new Bitmap cache_file
 		client = new System.Net.WebClient()
