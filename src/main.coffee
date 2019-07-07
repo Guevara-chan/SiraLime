@@ -25,6 +25,10 @@ class SiralimData
 				@crit_data feed.splice(1, 1 + feed.indexOf "------------------------------")
 		else throw new Error "Invalid export data provided."
 
+	get_field: (feed, field) ->
+		console.log field
+		feed.find((elem) -> elem.startsWith field + ": ").split(": ")[1]
+
 	player_data: (fragment) ->
 		[naming, spec] = fragment[0].split(', ').map (x) -> x.split ' '
 		title:	naming[0..naming.length-2].join(' ')
@@ -32,8 +36,10 @@ class SiralimData
 		level:	spec[1]
 		class:	spec[2]
 		runes:	fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
-		achievs:fragment[1].split(': ')[1]#.split(' ').join('')
-		played:	fragment[2].split(': ')[1]
+		achievs:@get_field(fragment, "Achievement Points")
+		played:	@get_field(fragment, "Time Played")
+		version:@get_field(fragment, "Game Version")
+		dpoints:@get_field(fragment, "Total Deity Points")
 
 	crit_data: (fragment) ->
 		[naming, typing] = fragment.map (x) -> x.split ' '
@@ -178,8 +184,8 @@ class CUI
 	pipe: (s3data) ->
 		{team, player} = s3data
 		@say "┌", 'white', 
-			"#{@plural 'creature', team.length} of #{player.title} #{player.name}
-			(lv#{player.level}|#{player.class})/#{player.played}#{player.achievs.split(' ')[-1..-1][0]} parsed:",'cyan'
+			"#{@plural 'creature', team.length} of #{player.title} #{player.name}(lv#{player.level}|#{player.class})
+			/#{player.played}#{player.achievs.split(' ')[-1..-1][0]} parsed:",'cyan'
 		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then '[N]' else ''), 'white', 
 				(if crit.arttrait then " /" else "") + crit.arttrait, 'darkGray') for crit in team
