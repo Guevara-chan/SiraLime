@@ -33,10 +33,10 @@ class SiralimData
 		achievments		= @get_field(fragment, "Achievement Points").split(' ')
 		title:	naming[0..naming.length-2].join(' ')
 		name:	naming[naming.length-1]
-		level:	spec[1]
+		level:	parseInt spec[1]
 		class:	spec[2]
 		runes:	fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
-		achievs: {got: achievments[0], total: achievments[2], progress: achievments[3]}
+		achievs: {got: parseInt(achievments[0]), total: parseInt(achievments[2]), progress: achievments[3]}
 		played:	@get_field(fragment, "Time Played")
 		version:@get_field(fragment, "Game Version")
 		dpoints:@get_field(fragment, "Total Deity Points")
@@ -46,7 +46,7 @@ class SiralimData
 		singular:	if naming[naming.length-1] == '(Singular)'	then naming.pop(); true else false
 		nether:		if naming[naming.length-1] == '(Nether)'	then naming.pop(); true else false
 		name:		name = naming[2..].join(' ')
-		level:		naming[1]
+		level:		parseInt naming[1]
 		kind:		typing[0..typing.length-3].join ' '
 		class:		typing[typing.length-1]
 		sprite:		@load_sprite(name)
