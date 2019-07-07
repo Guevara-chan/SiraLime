@@ -29,13 +29,14 @@ class SiralimData
 		feed.find((elem) -> elem.startsWith field + ": ").split(": ")[1]
 
 	player_data: (fragment) ->
-		[naming, spec] = fragment[0].split(', ').map (x) -> x.split ' '
+		[naming, spec]	= fragment[0].split(', ').map (x) -> x.split ' '
+		achievments		= @get_field(fragment, "Achievement Points").split(' ')
 		title:	naming[0..naming.length-2].join(' ')
 		name:	naming[naming.length-1]
 		level:	spec[1]
 		class:	spec[2]
 		runes:	fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
-		achievs:@get_field(fragment, "Achievement Points")
+		achievs: {got: achievments[0], total: achievments[2], progress: achievments[3]}
 		played:	@get_field(fragment, "Time Played")
 		version:@get_field(fragment, "Game Version")
 		dpoints:@get_field(fragment, "Total Deity Points")
@@ -132,7 +133,7 @@ class Lineup
 		@print_centered out, player.played,make_font("Impact",5.5),grid.xres*1.25,scale*7.5,@saturate Color.Coral,0.5
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
 		# Clock and achievments.
-		@print_centered out, player.achievs.split(" ")[0..-2].join(''), make_font("Impact", 5.5), grid.xres * 1.75, 
+		@print_centered out, player.achievs.got+"/"+player.achievs.total, make_font("Impact", 5.5), grid.xres * 1.75, 
 			scale * 7.5, Color.FromArgb(120, 120, 0)
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.5, grid.caption * 0.4, grid.xres * 1.5, grid.caption * 0.75
 
@@ -184,7 +185,7 @@ class CUI
 		{team, player} = s3data
 		@say "┌", 'white', 
 			"#{@plural 'creature', team.length} of #{player.title} #{player.name}(lv#{player.level}|#{player.class})
-			/#{player.played}#{player.achievs.split(' ')[-1..-1][0]} parsed:",'cyan'
+			/#{player.played}#{player.achievs.progress} parsed:",'cyan'
 		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then '[N]' else ''), 'white', 
 				(if crit.arttrait then " /" else "") + crit.arttrait, 'darkGray') for crit in team
