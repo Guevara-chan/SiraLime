@@ -26,7 +26,6 @@ class SiralimData
 		else throw new Error "Invalid export data provided."
 
 	get_field: (feed, field) ->
-		console.log field
 		feed.find((elem) -> elem.startsWith field + ": ").split(": ")[1]
 
 	player_data: (fragment) ->
