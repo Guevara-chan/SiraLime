@@ -25,6 +25,9 @@ class SiralimData
 				@crit_data feed.splice(1, 1 + feed.indexOf "------------------------------")
 		else throw new Error "Invalid export data provided."
 
+	@capitalize: (txt) ->
+		txt[0].toUpperCase() + txt[1..]#.toLowerCase()
+
 	get_field: (feed, field) ->
 		feed.find((elem) -> elem.startsWith field + ": ").split(": ")[1]
 
@@ -54,6 +57,9 @@ class SiralimData
 		class:		typing[typing.length-1]
 		sprite:		@load_sprite(name)
 		arttrait:	(fragment.find((x) -> x.startsWith 'Trait: ')?.split(' ')[1..].join(' ')) ? ""
+		stats:		@get_field(fragment, SiralimData.capitalize stat) for stat in [
+				'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
+
 
 	load_sprite: (crit_name) ->
 		cache_file = "res\\#{crit_name}.png"
@@ -204,9 +210,6 @@ class CUI
 		@say("\nWork complete: image successfully pasted to clipboard !", 'green')
 		return img
 
-	capitalize: (txt) ->
-		txt[0].toUpperCase() + txt[1..]#.toLowerCase()
-
 	plural: (word, num, concat = true) ->
 		"#{if concat then num else ''} #{word}#{if num == 1 then '' else 's'}"
 	
@@ -214,7 +217,7 @@ class CUI
 		arg = 0
 		while arg < arguments.length
 			[txt, color] = [arguments[arg++], arguments[arg++]]
-			if color? then System.Console.ForegroundColor = System.ConsoleColor[@capitalize color]
+			if color? then System.Console.ForegroundColor = System.ConsoleColor[SiralimData.capitalize color]
 			process.stdout.write txt
 		console.log ""
 
@@ -227,6 +230,7 @@ class CUI
 #.}
 
 # --Main code--
+SiralimData.capitalize "12"
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
 try 
 	ui = new CUI
