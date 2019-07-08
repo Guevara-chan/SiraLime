@@ -194,9 +194,8 @@ class CUI
 				(if crit.arttrait then " /" else "") + crit.arttrait, 'darkGray') for crit in team
 		@say "├─►", 'white', (if player.runes then player.runes.join('/') else "No") +
 			"#{@plural 'rune', player.runes.length, false} equipped.", 'yellow'
-		#############################
-		@say("├▬", 'white', "#{perk.name}: #{perk.lvl}", 'darkGray') for perk in player.perks
-		#############################
+		@say("│▬", 'white', "#{perk.name}: #{perk.lvl} #{if perk.max then '/ ' + perk.max else ''}", 
+			'darkGray') for perk in player.perks
 		@say "└", 'white', "Total deity points = #{player.dpoints}", 'Magenta'
 		return s3data
 
