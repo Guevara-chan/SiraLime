@@ -234,7 +234,6 @@ class CUI
 #.}
 
 # --Main code--
-SiralimData.capitalize "12"
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
 try 
 	ui = new CUI
