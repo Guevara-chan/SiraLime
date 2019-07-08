@@ -19,7 +19,7 @@ class SiralimData
 		if feed[0] is '========== CHARACTER ==========' # If header is valid...
 			System.IO.File.WriteAllText source_cache, src, System.Text.Encoding.ASCII
 			# Parsing player section.
-			console.log @player = @player_data feed.splice(1, feed.indexOf "========== CREATURES ==========")
+			@player = @player_data feed.splice(1, feed.indexOf "========== CREATURES ==========")
 			# Parsing creature sections.
 			@team = while feed.length > 2
 				@crit_data feed.splice(1, 1 + feed.indexOf "------------------------------")
@@ -36,11 +36,11 @@ class SiralimData
 		name:		naming[naming.length-1]
 		level:		BigInt spec[1]
 		class:		spec[2]
-		runes:		fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
-		achievs:	{got: parseInt(achievments[0]), total: parseInt(achievments[2]), progress: achievments[3]}
 		played:		@get_field(fragment, "Time Played")
 		version:	@get_field(fragment, "Game Version")
 		dpoints:	BigInt @get_field(fragment, "Total Deity Points")
+		runes:		fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
+		achievs:	{got: parseInt(achievments[0]), total: parseInt(achievments[2]), progress: achievments[3]}
 		perks:		fragment.filter((x) -> perkfinder.test x).map (x) ->
 			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
 
@@ -192,8 +192,12 @@ class CUI
 		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then '[N]' else ''), 'white', 
 				(if crit.arttrait then " /" else "") + crit.arttrait, 'darkGray') for crit in team
-		@say "└", 'white', (if player.runes then player.runes.join('/') else "No") +
+		@say "├─►", 'white', (if player.runes then player.runes.join('/') else "No") +
 			"#{@plural 'rune', player.runes.length, false} equipped.", 'yellow'
+		#############################
+		@say("├▬", 'white', "#{perk.name}: #{perk.lvl}", 'darkGray') for perk in player.perks
+		#############################
+		@say "└", 'white', "Total deity points = #{player.dpoints}", 'Magenta'
 		return s3data
 
 	show_off: (img) ->
