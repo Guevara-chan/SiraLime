@@ -48,6 +48,7 @@ class SiralimData
 			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
 
 	crit_data: (fragment) ->
+		accum = {}
 		[naming, typing] = fragment.map (x) -> x.split ' '
 		singular:	if naming[naming.length-1] == '(Singular)'	then naming.pop(); true else false
 		nether:		if naming[naming.length-1] == '(Nether)'	then naming.pop(); true else false
@@ -57,8 +58,8 @@ class SiralimData
 		class:		typing[typing.length-1]
 		sprite:		@load_sprite(name)
 		arttrait:	(fragment.find((x) -> x.startsWith 'Trait: ')?.split(' ')[1..].join(' ')) ? ""
-		stats:		@get_field(fragment, SiralimData.capitalize stat) for stat in [
-				'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
+		stats:		Object.assign accum, {[stat]: BigInt @get_field(fragment,SiralimData.capitalize stat)} for stat in [
+			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
 
 
 	load_sprite: (crit_name) ->
