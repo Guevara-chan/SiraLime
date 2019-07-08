@@ -19,7 +19,7 @@ class SiralimData
 		if feed[0] is '========== CHARACTER ==========' # If header is valid...
 			System.IO.File.WriteAllText source_cache, src, System.Text.Encoding.ASCII
 			# Parsing player section.
-			@player = @player_data feed.splice(1, feed.indexOf "========== CREATURES ==========")
+			console.log @player = @player_data feed.splice(1, feed.indexOf "========== CREATURES ==========")
 			# Parsing creature sections.
 			@team = while feed.length > 2
 				@crit_data feed.splice(1, 1 + feed.indexOf "------------------------------")
@@ -30,16 +30,19 @@ class SiralimData
 
 	player_data: (fragment) ->
 		[naming, spec]	= fragment[0].split(', ').map (x) -> x.split ' '
+		perkfinder		= /([\w\s]+) \(Rank (\d*)(?: \/ )(\d*)?\)/
 		achievments		= @get_field(fragment, "Achievement Points").split(' ')
-		title:	naming[0..naming.length-2].join(' ')
-		name:	naming[naming.length-1]
-		level:	BigInt spec[1]
-		class:	spec[2]
-		runes:	fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
-		achievs: {got: parseInt(achievments[0]), total: parseInt(achievments[2]), progress: achievments[3]}
-		played:	@get_field(fragment, "Time Played")
-		version:@get_field(fragment, "Game Version")
-		dpoints:@get_field(fragment, "Total Deity Points")
+		title:		naming[0..naming.length-2].join(' ')
+		name:		naming[naming.length-1]
+		level:		BigInt spec[1]
+		class:		spec[2]
+		runes:		fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
+		achievs:	{got: parseInt(achievments[0]), total: parseInt(achievments[2]), progress: achievments[3]}
+		played:		@get_field(fragment, "Time Played")
+		version:	@get_field(fragment, "Game Version")
+		dpoints:	BigInt @get_field(fragment, "Total Deity Points")
+		perks:		fragment.filter((x) -> perkfinder.test x).map (x) ->
+			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
 
 	crit_data: (fragment) ->
 		[naming, typing] = fragment.map (x) -> x.split ' '
