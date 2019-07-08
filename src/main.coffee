@@ -48,8 +48,10 @@ class SiralimData
 			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
 
 	crit_data: (fragment) ->
-		accum = {}
 		[naming, typing] = fragment.map (x) -> x.split ' '
+		stats = {}
+		Object.assign stats, {[stat]: BigInt @get_field(fragment,SiralimData.capitalize stat)} for stat in [
+			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
 		singular:	if naming[naming.length-1] == '(Singular)'	then naming.pop(); true else false
 		nether:		if naming[naming.length-1] == '(Nether)'	then naming.pop(); true else false
 		name:		name = naming[2..].join(' ')
@@ -58,8 +60,7 @@ class SiralimData
 		class:		typing[typing.length-1]
 		sprite:		@load_sprite(name)
 		arttrait:	(fragment.find((x) -> x.startsWith 'Trait: ')?.split(' ')[1..].join(' ')) ? ""
-		stats:		Object.assign accum, {[stat]: BigInt @get_field(fragment,SiralimData.capitalize stat)} for stat in [
-			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
+		stats:		stats
 
 
 	load_sprite: (crit_name) ->
@@ -196,10 +197,12 @@ class CUI
 		@say "┌", 'white', 
 			"#{@plural 'creature', team.length} of #{player.title} #{player.name}(lv#{player.level}|#{player.class
 			})/#{player.played}#{player.achievs.progress} parsed:",'cyan'
-		@say("├>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
+		@say("├┬>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then '[N]' else ''), 'white', 
-				(if crit.arttrait then " /" else "") + crit.arttrait, 'darkGray') for crit in team
-		@say "└╥─", 'white', "Total deity points = #{player.dpoints}", 'Magenta'
+			(if crit.arttrait then " /" else "") + crit.arttrait, 'darkYellow',
+			"\n│└", 'white', ("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray'
+			) for crit in team
+		@say "└╥──", 'white', "Total deity points = #{player.dpoints}", 'Magenta'
 		@say(" ║", 'white', "#{perk.name}: #{perk.lvl} #{if perk.max then '/ ' + perk.max else ''}", 
 			'darkGray') for perk in player.perks
 		@say " ╟─", 'white', (if player.runes then player.runes.join('/') else "No") +
