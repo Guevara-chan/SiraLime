@@ -32,13 +32,13 @@ class SiralimData
 		feed.find((elem) -> elem.startsWith field + ": ").split(": ")[1]
 
 	player_data: (fragment) ->
-		[naming, spec]	= fragment[0].split(', ').map (x) -> x.split ' '
+		headline		= fragment[0].match(/([\w\s]+) (\w*), Level (\d*) (\w*) Mage/)
 		perkfinder		= /([\w\s]+) \(Rank (\d*)(?: \/ )(\d*)?\)/
 		achievments		= @get_field(fragment, "Achievement Points").split(' ')
-		title:		naming[0..naming.length-2].join(' ')
-		name:		naming[naming.length-1]
-		level:		BigInt spec[1]
-		class:		spec[2]
+		title:		headline[1]
+		name:		headline[2]
+		level:		BigInt headline[3]
+		class:		headline[4]
 		played:		@get_field(fragment, "Time Played")
 		version:	@get_field(fragment, "Game Version")
 		dpoints:	BigInt @get_field(fragment, "Total Deity Points")
@@ -60,7 +60,7 @@ class SiralimData
 		class:		typing[typing.length-1]
 		sprite:		@load_sprite(name)
 		arttrait:	fragment.find((x) -> x.startsWith 'Trait: ').match(/: ([\w\s]+)/)[1] ? ""
-		gems:		fragment.filter((x) -> x.startsWith 'Gem of ').map((x) -> /of ([\w\s]+) \(/.exec(x)[1])
+		gems:		fragment.filter((x) -> x.startsWith 'Gem of ').map((x) -> x.match(/of ([\w\s]+) \(/)[1])
 		stats:		stats
 
 
