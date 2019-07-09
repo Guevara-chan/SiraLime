@@ -5,7 +5,7 @@ header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
 """
-clr = require('clr').init assemblies: ['System','mscorlib','System.Drawing','System.Windows.Forms','PresentationCore']
+clr = require('clr').init assemblies: 'System|mscorlib|System.Drawing|System.Windows.Forms|PresentationCore'.split '|'
 Object.assign global, namespace for namespace in [System.Drawing]
 
 #.{ [Classes]
