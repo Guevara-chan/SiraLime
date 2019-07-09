@@ -52,8 +52,11 @@ class SiralimData
 
 	crit_data: (fragment) ->
 		[stats, naming, spec] = [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
-		Object.assign stats, {[stat]: BigInt @get_field(fragment,SiralimData.capitalize stat)} for stat in [
+		Object.assign stats, {[stat]: BigInt @get_field(fragment, SiralimData.capitalize stat)} for stat in [
 			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
+		art_idx = fragment.findIndex (x) -> x.startsWith "Artifact: "
+
+
 		singular:	if naming[naming.length-1] == '(Singular)'	then naming.pop(); true else false
 		nether:		if naming[naming.length-1] == '(Nether)'	then naming.pop(); true else false
 		name:		name = naming[2..].join(' ')
@@ -198,18 +201,21 @@ class CUI
 
 	pipe: (s3data) ->
 		{team, player} = s3data
-		@say "┌", 'white', 
+		@say '┌', 'white', 
 			"#{@plural 'creature', team.length} of #{player.title} #{player.name}(lv#{player.level}|#{player.class
 			})/#{player.played}#{player.achievs.progress} parsed:",'cyan'
 		@say("├┬>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then ['[N', crit.aura].join(':')+"]" else ''), 'white', 
 			(if crit.arttrait then " /" else "") + crit.arttrait, 'darkYellow',
-			"\n│└", 'white', ("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray'
+			#'\n│├', 'white', 
+			'\n││┌', 'white', ("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray'
+			'\n│[', 'white', '■', @color_code[crit.class], '] ', 'white',
+			(if crit.gems.length then crit.gems.join ', ' else '<none>'), 'darkGray'
 			) for crit in team
-		@say "└╥──", 'white', "Total deity points = #{player.dpoints}", 'Magenta'
-		@say(" ║", 'white', "#{perk.name}: ", 'darkYellow'
+		@say '└╥──', 'white', "Total deity points = #{player.dpoints}", 'Magenta'
+		@say(' ║', 'white', "#{perk.name}: ", 'darkYellow'
 			"#{perk.lvl} #{if perk.max then '/ ' + perk.max else ''}", 'darkGray') for perk in player.perks
-		@say " ╟─", 'white', (if player.runes then player.runes.join('/') else "No") +
+		@say ' ╟─', 'white', (if player.runes then player.runes.join('/') else "No") +
 			"#{@plural 'rune', player.runes.length, false} equipped.", 'yellow'
 		@say " ╙──►Game version: #{player.version}", 'white'
 		return s3data
