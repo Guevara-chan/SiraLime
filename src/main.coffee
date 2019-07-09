@@ -32,7 +32,7 @@ class SiralimData
 		feed.find((elem) -> elem.startsWith field + ": ").split(": ")[1]
 
 	player_data: (fragment) ->
-		headline		= fragment[0].match(/([\w\s]+) (\w*), Level (\d*) (\w*) Mage/)
+		headline		= fragment[0].match(/([\w\s]+) (.*), Level (\d*) (\w*) Mage/)
 		perkfinder		= /([\w\s]+) \(Rank (\d*)(?: \/ )(\d*)?\)/
 		achievments		= @get_field(fragment, "Achievement Points").split(' ')
 		title:		headline[1]
