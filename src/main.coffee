@@ -1,6 +1,6 @@
 header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-	# SiraLime teamcards renderer v0.35
+	# SiraLime teamcards renderer v0.4
 	# Developed in 2019 by Guevara-chan
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
@@ -205,12 +205,15 @@ class CUI
 			"#{@plural 'creature', team.length} of #{player.title} #{player.name}(lv#{player.level}|#{player.class
 			})/#{player.played}#{player.achievs.progress} parsed:",'cyan'
 		@say("├┬>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
-			(if crit.nether then ['[N', crit.aura].join(':')+"]" else ''), 'white', 
+			(if crit.nether then ['[N', crit.aura].join(':')+"]" else ''), 'yellow', 
 			(if crit.arttrait then " /" else "") + crit.arttrait, 'darkYellow',
 			'\n││', 'white', '┌', @color_code[crit.class], 
 			("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray',
 			'\n│╘', 'white', '▒', @color_code[crit.class], ': ', 'white',
-			(if crit.gems.length then crit.gems.join ', ' else '<none>'), 'darkGray'
+			(if crit.gems.length then crit.gems.join ', ' else '<no gems>'), 'darkGray'
+			(if crit.nethtraits.length then '\n│ ' else ""), 'white',
+			(if crit.nethtraits.length then '╙─' else ""), @color_code[crit.class],
+			crit.nethtraits.join(' // '), 'yellow',
 			) for crit in team
 		@say '└╥──', 'white', "Total deity points = #{player.dpoints}", 'Magenta'
 		@say(' ║', 'white', "#{perk.name}: ", 'darkYellow'
