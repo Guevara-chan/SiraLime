@@ -48,7 +48,7 @@ class SiralimData
 			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
 
 	crit_data: (fragment) ->
-		[stats, naming, spec] = [{},fragment[0].split(' '), fragment[1].match /(\w*) \/ (\w*)/]
+		[stats, naming, spec] = [{},fragment[0].split(' '), fragment[1].match /([\w\s]+) \/ (\w*)/]
 		Object.assign stats, {[stat]: BigInt @get_field(fragment,SiralimData.capitalize stat)} for stat in [
 			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
 		singular:	if naming[naming.length-1] == '(Singular)'	then naming.pop(); true else false
