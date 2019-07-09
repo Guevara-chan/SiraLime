@@ -59,8 +59,8 @@ class SiralimData
 		kind:		typing[0..typing.length-3].join ' '
 		class:		typing[typing.length-1]
 		sprite:		@load_sprite(name)
-		arttrait:	(fragment.find((x) -> x.startsWith 'Trait: ')?.split(' ')[1..].join(' ')) ? ""
-		gems:		console.log fragment.filter((x) -> x.startsWith 'Gem of ').map((x) -> /of ([\w\s]+) \(/.exec(x)[1])
+		arttrait:	fragment.find((x) -> x.startsWith 'Trait: ').match(/: ([\w\s]+)/)[1] ? ""
+		gems:		fragment.filter((x) -> x.startsWith 'Gem of ').map((x) -> /of ([\w\s]+) \(/.exec(x)[1])
 		stats:		stats
 
 
