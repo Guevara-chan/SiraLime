@@ -29,7 +29,10 @@ class SiralimData
 		txt[0].toUpperCase() + txt[1..]#.toLowerCase()
 
 	get_field: (feed, field) ->
-		feed.find((elem) -> elem.startsWith field + ": ")?.split(field + ": ")[1] 
+		feed.find((elem) -> elem.startsWith field + ": ")?.split(field + ": ")[1]
+
+	get_list: (feed, matcher) ->
+		feed.filter((x) -> matcher.test x).map((x) -> x.match(matcher)[1])
 
 	player_data: (fragment) ->
 		headline	= fragment[0].match(/([\w\s]+) (.*), Level (\d*) (\w*) Mage/)
@@ -42,7 +45,7 @@ class SiralimData
 		played:		@get_field(fragment, "Time Played")
 		version:	@get_field(fragment, "Game Version")
 		dpoints:	BigInt @get_field(fragment, "Total Deity Points")
-		runes:		fragment.filter((x) -> /(\w*) Rune:/.test x).map((x) -> x.split(' ')[0]) ? []
+		runes:		@get_list(fragment, /(\w*) Rune:/)
 		achievs:	{got: parseInt(achievments[0]), total: parseInt(achievments[2]), progress: achievments[3]}
 		perks:		fragment.filter((x) -> perkfinder.test x).map (x) ->
 			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
@@ -60,7 +63,8 @@ class SiralimData
 		sprite:		@load_sprite(name)
 		aura:		@get_field(fragment, "Nether Aura: Nether Aura") ? ""
 		arttrait:	@get_field(fragment, "Trait") ? ""
-		gems:		fragment.filter((x) -> x.startsWith 'Gem of ').map((x) -> x.match(/of ([\w\s]+) \(/)[1])
+		nethtraits:	@get_list(fragment, /Nether Trait: ([\w\s]+)/)
+		gems:		@get_list(fragment, /Gem of ([\w\s]+) \(Mana/)
 		stats:		stats
 
 	load_sprite: (crit_name) ->
