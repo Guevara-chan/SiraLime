@@ -36,7 +36,7 @@ class SiralimData
 
 	player_data: (fragment) ->
 		headline	= fragment[0].match(/([\w\s]+) (.*), Level (\d*) (\w*) Mage/)
-		perkfinder	= /([\w\s]+) \(Rank (\d*)(?: \/ )(\d*)?\)/
+		perkfinder	= /(.*) \(Rank (\d*)(?: \/ )(\d*)?\)/
 		achievments	= @get_field(fragment, "Achievement Points").split(' ')
 		title:		headline[1]
 		name:		headline[2]
@@ -51,7 +51,7 @@ class SiralimData
 			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
 
 	crit_data: (fragment) ->
-		[stats, naming, spec] = [{},fragment[0].split(' '), fragment[1].match /([\w\s]+) \/ (\w*)/]
+		[stats, naming, spec] = [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
 		Object.assign stats, {[stat]: BigInt @get_field(fragment,SiralimData.capitalize stat)} for stat in [
 			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
 		singular:	if naming[naming.length-1] == '(Singular)'	then naming.pop(); true else false
@@ -63,8 +63,8 @@ class SiralimData
 		sprite:		@load_sprite(name)
 		aura:		@get_field(fragment, "Nether Aura: Nether Aura") ? ""
 		arttrait:	@get_field(fragment, "Trait") ? ""
-		nethtraits:	@get_list(fragment, /Nether Trait: ([\w\s]+)/)
-		gems:		@get_list(fragment, /Gem of ([\w\s]+) \(Mana/)
+		nethtraits:	@get_list(fragment, /Nether Trait: (.*)/)
+		gems:		@get_list(fragment, /Gem of (.*) \(Mana/)
 		stats:		stats
 
 	load_sprite: (crit_name) ->
