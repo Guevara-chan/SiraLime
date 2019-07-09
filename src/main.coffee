@@ -42,7 +42,7 @@ class SiralimData
 		played:		@get_field(fragment, "Time Played")
 		version:	@get_field(fragment, "Game Version")
 		dpoints:	BigInt @get_field(fragment, "Total Deity Points")
-		runes:		fragment.filter((x) -> x.split(' ')[1] == 'Rune:').map((x) -> x.split(' ')[0]) ? []
+		runes:		fragment.filter((x) -> /(\w*) Rune:/.test x).map((x) -> x.split(' ')[0]) ? []
 		achievs:	{got: parseInt(achievments[0]), total: parseInt(achievments[2]), progress: achievments[3]}
 		perks:		fragment.filter((x) -> perkfinder.test x).map (x) ->
 			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
