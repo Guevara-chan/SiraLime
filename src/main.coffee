@@ -209,7 +209,7 @@ class CUI
 			(if crit.arttrait then " /" else "") + crit.arttrait, 'darkYellow',
 			'\n││', 'white', '┌', @color_code[crit.class], 
 			("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray',
-			'\n│[', 'white', '▒', @color_code[crit.class], '] ', 'white',
+			'\n│╘', 'white', '▒', @color_code[crit.class], ': ', 'white',
 			(if crit.gems.length then crit.gems.join ', ' else '<none>'), 'darkGray'
 			) for crit in team
 		@say '└╥──', 'white', "Total deity points = #{player.dpoints}", 'Magenta'
