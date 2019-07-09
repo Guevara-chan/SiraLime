@@ -207,7 +207,8 @@ class CUI
 		@say("├┬>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then ['[N', crit.aura].join(':')+"]" else ''), 'white', 
 			(if crit.arttrait then " /" else "") + crit.arttrait, 'darkYellow',
-			'\n││┌', 'white', ("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray'
+			'\n││', 'white', '┌', @color_code[crit.class], 
+			("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray',
 			'\n│[', 'white', '■', @color_code[crit.class], '] ', 'white',
 			(if crit.gems.length then crit.gems.join ', ' else '<none>'), 'darkGray'
 			) for crit in team
