@@ -63,7 +63,6 @@ class SiralimData
 		gems:		fragment.filter((x) -> x.startsWith 'Gem of ').map((x) -> x.match(/of ([\w\s]+) \(/)[1])
 		stats:		stats
 
-
 	load_sprite: (crit_name) ->
 		cache_file = "res\\#{crit_name}.png"
 		try return new Bitmap cache_file
@@ -199,7 +198,7 @@ class CUI
 			"#{@plural 'creature', team.length} of #{player.title} #{player.name}(lv#{player.level}|#{player.class
 			})/#{player.played}#{player.achievs.progress} parsed:",'cyan'
 		@say("├┬>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
-			(if crit.nether then '[N]' else ''), 'white', 
+			(if crit.nether then ['[N', crit.aura].join(':')+"]" else ''), 'white', 
 			(if crit.arttrait then " /" else "") + crit.arttrait, 'darkYellow',
 			"\n│└", 'white', ("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray'
 			) for crit in team
