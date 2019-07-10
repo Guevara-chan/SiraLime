@@ -57,8 +57,8 @@ class SiralimData
 		art_idx = fragment.findIndex (x) -> x.startsWith "Artifact: "
 
 
-		singular:	if naming[naming.length-1] == '(Singular)'	then naming.pop(); true else false
-		nether:		if naming[naming.length-1] == '(Nether)'	then naming.pop(); true else false
+		singular:	if naming[naming.length-1] is '(Singular)'	then naming.pop(); true else false
+		nether:		if naming[naming.length-1] is '(Nether)'	then naming.pop(); true else false
 		name:		name = naming[2..].join(' ')
 		level:		BigInt naming[1]
 		kind:		spec[1]
@@ -228,7 +228,7 @@ class CUI
 		return img
 
 	plural: (word, num, concat = true) ->
-		"#{if concat then num else ''} #{word}#{if num == 1 then '' else 's'}"
+		"#{if concat then num else ''} #{word}#{if num is 1 then '' else 's'}"
 	
 	say: (txt, color) ->
 		arg = 0
