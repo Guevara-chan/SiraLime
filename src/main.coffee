@@ -250,9 +250,7 @@ class CUI
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
 try 
 	ui = new CUI
-	feed = try new SiralimData System.Windows.Clipboard.GetText() catch
-		new SiralimData
+	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
 	new Lineup(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
-catch ex
-	ui.fail(ex)
+catch ex then ui.fail(ex)
 ui.done()
