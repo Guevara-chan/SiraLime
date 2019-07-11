@@ -209,17 +209,22 @@ class CUI
 		@say '┌', 'white', 
 			"#{@plural 'creature', team.length} of #{player.title} #{player.name} (lv#{player.level}|#{player.class
 			})/#{player.played}#{player.achievs.progress} parsed:",'cyan'
-		@say("├┬>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
+		for crit in team
+			@say("├┬>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then ['[N', crit.aura].join(':')+"]" else ''), 'yellow', 
 			(if crit.art.trait then " /" else "") + crit.art.trait, 'darkYellow',
 			'\n││', 'white', '┌', @color_code[crit.class], 
 			("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray',
-			'\n│╘', 'white', '▒', @color_code[crit.class], ': ', 'white',
+			'\n│' + (if crit.art.name then '╞' else '╘'), 'white', '▒', @color_code[crit.class], ': ', 'white',
 			(if crit.gems.length then crit.gems.join ', ' else '<no gems>'), 'darkGray'
-			(if crit.nethtraits.length then '\n│ ' else ""), 'white',
+			(if crit.nethtraits.length then '\n│' + (if crit.art.name then '│' else ' ') else ""), 'white',
 			(if crit.nethtraits.length then '╙─' else ""), @color_code[crit.class],
-			crit.nethtraits.join(' // '), 'yellow',
-			) for crit in team
+			crit.nethtraits.join(' // '), 'yellow')
+			if crit.art.mods isnt []# Printing artifact modifiers now:
+				@say '│╘', 'white', '▒', 'darkYellow', ": ", 'white', crit.art.name, 'darkYellow'
+				for mod in crit.art.mods
+					@say '│ ', 'white', '╟', 'darkYellow', mod, 'darkGray'
+				@say '│ ', 'white', '╙∙∙∙∙∙∙∙∙∙∙∙', 'darkYellow'
 		@say '└╥──', 'white', "Total deity points = #{player.dpoints}", 'Magenta'
 		@say(' ║', 'white', "#{perk.name}: ", 'darkYellow'
 			"#{perk.lvl} #{if perk.max then '/ ' + perk.max else ''}", 'darkGray') for perk in player.perks
