@@ -29,7 +29,7 @@ class SiralimData
 		txt[0].toUpperCase() + txt[1..]#.toLowerCase()
 
 	get_field: (feed, field) ->
-		feed.find((elem) -> elem.startsWith field + ": ")?.split(field + ": ")[1]
+		feed?.find((elem) -> elem.startsWith field + ": ")?.split(field + ": ")[1]
 
 	get_list: (feed, matcher) ->
 		feed.filter((x) -> matcher.test x).map((x) -> x.match(matcher)[1])
@@ -56,7 +56,7 @@ class SiralimData
 		# Init setup.
 		[stats, naming, spec]	= [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
 		art_start				= fragment.findIndex (x) -> x.startsWith "Artifact: "
-		if art_start isnt -1 then art_data=fragment.splice(art_start,fragment.indexOf("",art_start)-art_start) else []
+		art_data = if art_start isnt -1 then fragment.splice(art_start,fragment.indexOf("",art_start)-art_start) else []
 		# Other stats.
 		singular:	if naming[naming.length-1] is '(Singular)'	then naming.pop(); true else false
 		nether:		if naming[naming.length-1] is '(Nether)'	then naming.pop(); true else false
@@ -66,12 +66,14 @@ class SiralimData
 		class:		spec[2]
 		sprite:		@load_sprite(name)
 		aura:		@get_field(fragment, "Nether Aura: Nether Aura") ? ""
-		arttrait:	@get_field(art_data, "Trait") ? ""
 		nethtraits:	@get_list(fragment, /Nether Trait: (.*)/)
 		gems:		@get_list(fragment, /Gem of (.*) \(Mana/)
 		stats:		(Object.assign stats,{[stat]: BigInt @get_field fragment, SiralimData.capitalize stat} for stat in [
 			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed'])[0]
-		artmods:	art_data
+		art:
+			name:	@get_field(art_data, "Artifact") ? ""
+			trait:	@get_field(art_data, "Trait") ? ""
+			mods:	art_data
 
 	load_sprite: (crit_name) ->
 		cache_file = "res\\#{crit_name}.png"
@@ -176,12 +178,12 @@ class Lineup
 			@draw_block out,cap.x,cap.y,cap.width,cap.height,cappen,new SolidBrush @set_alpha @color_code[crit.class],30
 			@print_centered out, text, capfont, grid.xres * (idx % 3 + 0.5), cap.y, @color_code[crit.class]
 			# Additional trait drawing.
-			if crit.arttrait
+			if crit.art.trait
 				[yoff, xoff, twidth] = [cap.y+cap.height, grid.xres * (idx % 3 + 0.5)]
-				twidth = TR.MeasureText(crit.arttrait, traitfont).Width * 0.96
+				twidth = TR.MeasureText(crit.art.trait, traitfont).Width * 0.96
 				@draw_block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height * 0.7,
 					cappen, new SolidBrush @grayscale(40, 200)
-				@print_centered out, crit.arttrait, traitfont, xoff, yoff-scale, @grayscale(160)
+				@print_centered out, crit.art.trait, traitfont, xoff, yoff-scale, @grayscale(160)
 		return result
 
 	save: (dest) =>		
@@ -209,7 +211,7 @@ class CUI
 			})/#{player.played}#{player.achievs.progress} parsed:",'cyan'
 		@say("├┬>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
 			(if crit.nether then ['[N', crit.aura].join(':')+"]" else ''), 'yellow', 
-			(if crit.arttrait then " /" else "") + crit.arttrait, 'darkYellow',
+			(if crit.art.trait then " /" else "") + crit.art.trait, 'darkYellow',
 			'\n││', 'white', '┌', @color_code[crit.class], 
 			("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray',
 			'\n│╘', 'white', '▒', @color_code[crit.class], ': ', 'white',
