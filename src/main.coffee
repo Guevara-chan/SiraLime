@@ -54,11 +54,8 @@ class SiralimData
 
 	crit_data: (fragment) ->
 		# Init setup.
-		[stats, naming, spec] = [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
-		Object.assign stats, {[stat]: BigInt @get_field(fragment, SiralimData.capitalize stat)} for stat in [
-			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
-		# Artifact data extraction.
-		art_start	= fragment.findIndex (x) -> x.startsWith "Artifact: "
+		[stats, naming, spec]	= [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
+		art_start				= fragment.findIndex (x) -> x.startsWith "Artifact: "
 		if art_start isnt -1 then art_data=fragment.splice(art_start,fragment.indexOf("",art_start)-art_start) else []
 		# Other stats.
 		singular:	if naming[naming.length-1] is '(Singular)'	then naming.pop(); true else false
@@ -72,7 +69,8 @@ class SiralimData
 		arttrait:	@get_field(art_data, "Trait") ? ""
 		nethtraits:	@get_list(fragment, /Nether Trait: (.*)/)
 		gems:		@get_list(fragment, /Gem of (.*) \(Mana/)
-		stats:		stats
+		stats:		(Object.assign stats,{[stat]: BigInt @get_field fragment, SiralimData.capitalize stat} for stat in [
+			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed'])[0]
 		artmods:	art_data
 
 	load_sprite: (crit_name) ->
