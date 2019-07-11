@@ -35,9 +35,11 @@ class SiralimData
 		feed.filter((x) -> matcher.test x).map((x) -> x.match(matcher)[1])
 
 	player_data: (fragment) ->
+		# Init setup.
 		headline	= fragment[0].match(/([\w\s]+) (.*), Level (\d*) (\w*) Mage/)
 		perkfinder	= /(.*) \(Rank (\d*)(?: \/ )(\d*)?\)/
 		achievments	= @get_field(fragment, "Achievement Points").split(' ')
+		# Actual extraction.
 		title:		headline[1]
 		name:		headline[2]
 		level:		BigInt headline[3]
@@ -51,12 +53,14 @@ class SiralimData
 			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
 
 	crit_data: (fragment) ->
+		# Init setup.
 		[stats, naming, spec] = [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
 		Object.assign stats, {[stat]: BigInt @get_field(fragment, SiralimData.capitalize stat)} for stat in [
 			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed']
-		art_idx = fragment.findIndex (x) -> x.startsWith "Artifact: "
-
-
+		# Artifact data extraction.
+		art_start	= fragment.findIndex (x) -> x.startsWith "Artifact: "
+		if art_start isnt -1 then art_data=fragment.splice(art_start,fragment.indexOf("",art_start)-art_start) else []
+		# Other stats.
 		singular:	if naming[naming.length-1] is '(Singular)'	then naming.pop(); true else false
 		nether:		if naming[naming.length-1] is '(Nether)'	then naming.pop(); true else false
 		name:		name = naming[2..].join(' ')
@@ -65,10 +69,11 @@ class SiralimData
 		class:		spec[2]
 		sprite:		@load_sprite(name)
 		aura:		@get_field(fragment, "Nether Aura: Nether Aura") ? ""
-		arttrait:	@get_field(fragment, "Trait") ? ""
+		arttrait:	@get_field(art_data, "Trait") ? ""
 		nethtraits:	@get_list(fragment, /Nether Trait: (.*)/)
 		gems:		@get_list(fragment, /Gem of (.*) \(Mana/)
 		stats:		stats
+		artmods:	art_data
 
 	load_sprite: (crit_name) ->
 		cache_file = "res\\#{crit_name}.png"
