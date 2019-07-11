@@ -26,10 +26,11 @@ class SiralimData
 		else throw new Error "Invalid export data provided."
 
 	@capitalize: (txt) ->
-		txt[0].toUpperCase() + txt[1..]#.toLowerCase()
+		txt[0].toUpperCase() + txt[1..]
 
 	get_field: (feed, field) ->
-		feed?.find((elem) -> elem.startsWith field + ": ")?.split(field + ": ")[1]
+		idx = feed?.findIndex((elem) -> elem.startsWith field + ": ")
+		feed.splice(idx, 1)[0].split(field + ": ")[1] if idx != -1		
 
 	get_list: (feed, matcher) ->
 		feed.filter((x) -> matcher.test x).map((x) -> x.match(matcher)[1])
@@ -159,7 +160,6 @@ class Lineup
 		@print_centered out, player.achievs.got+"/"+player.achievs.total, make_font("Impact", 5.5), grid.xres * 1.75, 
 			scale * 7.5, Color.FromArgb(120, 120, 0)
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.5, grid.caption * 0.4, grid.xres * 1.5, grid.caption * 0.75
-
 		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
 			[x, y] = [(idx % 3) * grid.xres, grid.header + (idx // 3) * (grid.yres + grid.caption)]
