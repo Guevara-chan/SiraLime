@@ -1,6 +1,6 @@
 header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-	# SiraLime teamcards renderer v0.5
+	# SiraLime teamcards renderer v0.45
 	# Developed in 2019 by Guevara-chan
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
