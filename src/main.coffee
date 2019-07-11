@@ -1,6 +1,6 @@
 header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-	# SiraLime teamcards renderer v0.4
+	# SiraLime teamcards renderer v0.5
 	# Developed in 2019 by Guevara-chan
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
@@ -220,11 +220,12 @@ class CUI
 			(if crit.nethtraits.length then '\n│' + (if crit.art.name then '│' else ' ') else ""), 'white',
 			(if crit.nethtraits.length then '╙─' else ""), @color_code[crit.class],
 			crit.nethtraits.join(' // '), 'yellow')
-			if crit.art.mods isnt []# Printing artifact modifiers now:
+			if crit.art.mods isnt [] # Printing artifact modifiers now:
 				@say '│╘', 'white', '▒', 'darkYellow', ": ", 'white', crit.art.name, 'darkYellow'
+				last = ""
 				for mod in crit.art.mods
-					@say '│ ', 'white', '╟', 'darkYellow', mod, 'darkGray'
-				@say '│ ', 'white', '╙∙∙∙∙∙∙∙∙∙∙∙', 'darkYellow'
+					@say '│ ', 'white', '╟', 'darkYellow', last = mod, 'darkGray'
+				@say '│ ', 'white', '╙' + '∙'.repeat(last.length), 'darkYellow'
 		@say '└╥──', 'white', "Total deity points = #{player.dpoints}", 'Magenta'
 		@say(' ║', 'white', "#{perk.name}: ", 'darkYellow'
 			"#{perk.lvl} #{if perk.max then '/ ' + perk.max else ''}", 'darkGray') for perk in player.perks
