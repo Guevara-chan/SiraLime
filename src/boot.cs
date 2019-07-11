@@ -9,12 +9,14 @@ static class SiraLime {
     public static extern IntPtr SetWinPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, uint wFlags);
 
 	static void Main() {
-		Console.WindowWidth = 95;
-		Console.WindowHeight = 60; // 68
-		Console.Title = ".[SiraLime].";
-		Console.Write("...Now loading...\r");
-		//Console.WindowHeight = 68;
-		CenterConsole();
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !AttachConsole(-1)) {
+			AllocConsole();	
+			Console.WindowWidth = 95;
+			Console.WindowHeight = 95 / 2; // 68
+			CenterConsole();
+			Console.Title = ".[SiraLime].";
+			Console.Write("...Now loading...\r");
+		}
 		using (Process node = new Process()) {
 			node.StartInfo.FileName = "bin\\node.exe";
     		node.StartInfo.Arguments = "-e require('./src/node_modules/coffeescript/register.js');require('./src/main.coffee')";
@@ -42,4 +44,8 @@ static class SiraLime {
     private static extern bool GetWindowRect(IntPtr hWnd, out RECT rc);
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool MoveWindow(IntPtr hWnd, int x, int y, int w, int h, bool repaint);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    static extern bool AttachConsole(int dwProcessId);
+    [DllImport("kernel32")]
+    static extern bool AllocConsole();
 }
