@@ -259,9 +259,9 @@ class CUI
 	# --Methods goes here.
 	constructor: () ->
 		[@fg, @bg] = [ System.Console.ForegroundColor, System.Console.BackgroundColor]
-		System.Console.Title = ".[SiraLime]."
-		System.Console.ForegroundColor = System.ConsoleColor.White
-		if System.Console.ForegroundColor isnt System.ConsoleColor.White then @emu = new TermEmu()
+		if System.Console.Title isnt ".[SiraLime]."
+			System.Console.Title = ".[SiraLime]."
+			@emu = new TermEmu()
 		@say header, "green"
 
 	pipe: (s3data) ->
