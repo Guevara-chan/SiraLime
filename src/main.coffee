@@ -1,6 +1,6 @@
 header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-	# SiraLime teamcards renderer v0.45
+	# SiraLime teamcards renderer v0.5
 	# Developed in 2019 by Guevara-chan
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
@@ -88,7 +88,7 @@ class SiralimData
 		bmp.Save(cache_file, Imaging.ImageFormat.Png)
 		return bmp
 # -------------------	
-class Lineup
+class Render
 	color_code:
 		Death:	Color.Magenta
 		Chaos:	Color.Crimson 
@@ -192,6 +192,62 @@ class Lineup
 		System.Windows.Clipboard.SetData System.Windows.Forms.DataFormats.Bitmap, @bmp
 		@bmp.Save(dest, Imaging.ImageFormat.Png) if dest
 # -------------------
+class TermEmu
+	colors: [0x000000, #Black = 0
+				0x000090, #DarkBlue = 1
+				0x009000, #DarkGreen = 2
+				0x009090, #DarkCyan = 3
+				0x900000, #DarkRed = 4
+				0x900090, #DarkMagenta = 5
+				0x909000, #DarkYellow = 6
+				0xC0C0C0, #Gray = 7
+				0x808080, #DarkGray = 8
+				0x0000FF, #Blue = 9
+				0x00FF00, #Green = 10
+				0x00FFFF, #Cyan = 11
+				0xFF0000, #Red = 12
+				0xFF00FF, #Magenta = 13
+				0xFFFF00, #Yellow = 14
+				0xFFFFFF  #White = 15
+			]
+
+	# --Methods goes here.
+	constructor: () ->
+		# Init setup.
+		@win = new System.Windows.Forms.Form()
+		@win.Controls.Add(@out = new System.Windows.Forms.RichTextBox())
+		[@win.Width, @win.Height, @win.Icon]		= [700, 700, new Icon('res\\siralim.ico')]
+		[@out.Width, @out.Height, @out.ReadOnly]	= [@win.Width, @win.Height, true]
+		@out.Dock			= System.Windows.Forms.DockStyle.Fill
+		@out.BorderStyle	= System.Windows.Forms.BorderStyle.None
+		@out.BackColor		= Color.Black
+		@win.Text			= System.Console.Title
+		# Custom font addition.
+		collect				= new Text.PrivateFontCollection()
+		collect.AddFontFile("res\\TerminalVector.ttf")
+		@out.Font			= new Font collect.Families.GetValue(0), 12, FontStyle.Regular,
+			GraphicsUnit.Pixel
+		# Finalization.
+		@win.StartPosition	= System.Windows.Forms.FormStartPosition.CenterScreen
+		@win.Show()
+
+	echo: (txt) ->
+		for line, idx in lines = txt.split('\n')
+			@out.SelectionStart = @out.TextLength
+			@out.SelectionColor = @fg
+			@out.AppendText line + (if idx < lines.length-1 then '\n' else '')
+		System.Windows.Forms.Application.DoEvents()
+		
+	set_fg: (color) ->
+		@fg = Color.FromArgb @colors[System.Convert.ChangeType(System.ConsoleColor[color], System.Int32)]
+
+	wait_for: (ms) ->
+		timer			= new System.Windows.Forms.Timer()
+		timer.Interval	= 3000
+		timer.Tick.add	(e) -> System.Windows.Forms.Application.Exit()
+		timer.Start()
+		System.Windows.Forms.Application.Run()
+# -------------------
 class CUI
 	color_code:
 		Death:	"darkMagenta"
@@ -204,6 +260,8 @@ class CUI
 	constructor: () ->
 		[@fg, @bg] = [ System.Console.ForegroundColor,  System.Console.BackgroundColor]
 		System.Console.Title = ".[SiraLime]."
+		System.Console.ForegroundColor
+		@emu = new ConEmu()
 		@say header, "green"
 
 	pipe: (s3data) ->
@@ -242,28 +300,35 @@ class CUI
 
 	plural: (word, num, concat = true) ->
 		"#{if concat then num else ''} #{word}#{if num is 1 then '' else 's'}"
+
+	out: (txt = '\n') ->
+		process.stdout.write txt
+		@emu?.echo txt
 	
 	say: (txt, color) ->
 		arg = 0
 		while arg < arguments.length
 			[txt, color] = [arguments[arg++], arguments[arg++]]
-			if color? then System.Console.ForegroundColor = System.ConsoleColor[SiralimData.capitalize color]
-			process.stdout.write txt
-		console.log ""
+			if color?# then
+				System.Console.ForegroundColor = System.ConsoleColor[SiralimData.capitalize color]
+				@emu?.set_fg SiralimData.capitalize color
+			@out txt
+		@out()
 
 	fail: (ex) ->
 		@say "FAIL:: #{ex}", 'red'
 
-	done: () ->
+	done: (lapse = 3000) ->
 		[System.Console.ForegroundColor, System.Console.BackgroundColor] = [@fg, @bg]
-		System.Threading.Thread.Sleep(3000)
+		if @emu? then @emu.wait_for(lapse) else System.Threading.Thread.Sleep(lapse)
 #.}
 
 # --Main code--
+System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false)
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
 try 
 	ui = new CUI
 	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
-	new Lineup(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
+	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
 catch ex then ui.fail(ex)
 ui.done()
