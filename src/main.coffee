@@ -29,8 +29,9 @@ class SiralimData
 		txt[0].toUpperCase() + txt[1..]
 
 	get_field: (feed, field) ->
-		idx = feed?.findIndex((elem) -> elem.startsWith field + ": ")
-		feed.splice(idx, 1)[0].split(field + ": ")[1] if idx != -1		
+		matcher = new RegExp field + ": (.*)"
+		idx = feed?.findIndex((elem) -> matcher.test elem)
+		feed.splice(idx, 1)[0].match(matcher)[-1..][0] if idx != -1		
 
 	get_list: (feed, matcher) ->
 		feed.filter((x) -> matcher.test x).map((x) -> x.match(matcher)[1])
@@ -69,8 +70,9 @@ class SiralimData
 		aura:		@get_field(fragment, "Nether Aura: Nether Aura") ? ""
 		nethtraits:	@get_list(fragment, /Nether Trait: (.*)/)
 		gems:		@get_list(fragment, /Gem of (.*) \(Mana/)
-		stats:		(Object.assign stats,{[stat]: BigInt @get_field fragment, SiralimData.capitalize stat} for stat in [
-			'health', 'mana', 'attack', 'intelligence', 'defense', 'speed'])[0]
+		stats:		(Object.assign stats,
+			{[stat]: BigInt @get_field fragment, SiralimData.capitalize(stat) + '( \\(.*\\))?'} for stat in [
+				'health', 'mana', 'attack', 'intelligence', 'defense', 'speed'])[0]
 		art:
 			name:	@get_field(art_data, "Artifact") ? ""
 			trait:	@get_field(art_data, "Trait") ? ""
