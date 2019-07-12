@@ -216,7 +216,7 @@ class TermEmu
 		# Init setup.
 		@win = new System.Windows.Forms.Form()
 		@win.Controls.Add(@out = new System.Windows.Forms.RichTextBox())
-		[@win.Width, @win.Height, @win.Icon]		= [700, 700, new Icon('res\\siralim.ico')]
+		[@win.Width, @win.Height, @win.Icon]		= [790, 700, new Icon('res\\siralim.ico')]
 		[@out.Width, @out.Height, @out.ReadOnly]	= [@win.Width, @win.Height, true]
 		@out.Dock			= System.Windows.Forms.DockStyle.Fill
 		@out.BorderStyle	= System.Windows.Forms.BorderStyle.None
