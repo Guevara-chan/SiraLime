@@ -213,7 +213,7 @@ class TermEmu
 		DarkGreen:		0x009000
 		DarkCyan:		0x009090
 		DarkRed:		0x900000
-		DarkMegenta:	0x900090
+		DarkMagenta:	0x900090
 		DarkYellow:		0x909000
 		Gray:			0xC0C0C0
 		DarkGray:		0x808080
