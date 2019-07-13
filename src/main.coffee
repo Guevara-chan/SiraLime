@@ -314,11 +314,7 @@ class CUI
 	say: (txt, color) ->
 		arg = 0
 		while arg < arguments.length
-			[txt, color] = [arguments[arg++], arguments[arg++]]
-			if color?
-				System.Console.ForegroundColor = System.ConsoleColor[SiralimData.capitalize color]
-				@emu?.fg = SiralimData.capitalize color
-			@out txt
+			@out ([txt, @color] = [arguments[arg++], SiralimData.capitalize arguments[arg++] ? ""])[0]
 		@out()
 
 	fail: (ex) ->
@@ -327,6 +323,9 @@ class CUI
 	done: (lapse = 3000) ->
 		[System.Console.ForegroundColor, System.Console.BackgroundColor] = [@fg, @bg]
 		if @emu? then @emu.wait_for(lapse) else System.Threading.Thread.Sleep(lapse)
+
+	# --Properties goes here.
+	@setter 'color', (val) -> if val then System.Console.ForegroundColor = System.ConsoleColor[val]; @emu?.fg = val
 #.}
 
 # --Main code--
