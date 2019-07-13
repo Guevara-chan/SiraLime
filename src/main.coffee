@@ -1,6 +1,6 @@
 header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-	# SiraLime teamcards renderer v0.5
+	# SiraLime teamcards renderer v0.55
 	# Developed in 2019 by Guevara-chan
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
@@ -105,9 +105,13 @@ class Render
 	constructor: (s3data, pipe, show_off, dest = 'last.png') ->
 		# Init setup.
 		customfonts = new Text.PrivateFontCollection()
-		customfonts.AddFontFile("res\\Dosis-SemiBold.ttf")
+		customfonts.AddFontFile("res/fonts/Dosis-SemiBold.ttf")
+		customfonts.AddFontFile("res/fonts/Impact.ttf")
+		customfonts.AddFontFile("res/fonts/Sylfaen.ttf")
 		@fonts		=
-			Dosis: customfonts.Families.GetValue(0)
+			Dosis:		customfonts.Families.GetValue(0)
+			Impact:		customfonts.Families.GetValue(1)
+			Sylfaen:	customfonts.Families.GetValue(2)
 		# Actual render.
 		@bmp		= show_off @render pipe s3data
 		@save(dest)
@@ -132,7 +136,7 @@ class Render
 		# Aux procedure.
 		make_font = (family, size, style = FontStyle.Regular) =>
 			#console.log size
-			new Font family, scale * size, style, System.Drawing.GraphicsUnit.Pixel
+			new Font @fonts[family], scale * size, style, System.Drawing.GraphicsUnit.Pixel
 		# Init setup.
 		{player, team}	= s3data
 		grid =
@@ -142,7 +146,7 @@ class Render
 			header:	scale * 15
 		result		= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
 		out			= Graphics.FromImage(result)
-		capfont		= make_font @fonts.Dosis, 7.5
+		capfont		= make_font "Dosis", 7.5
 		traitfont	= make_font "Sylfaen", 6.5
 		hdrfont		= make_font "Impact", 7.5
 		subhdrfont	= make_font "Impact", 6
@@ -153,7 +157,7 @@ class Render
 		# BG drawing.
 		bgpen			= new Pen Color.DarkGray, 1
 		bgpen.DashStyle	= Drawing2D.DashStyle.Dash
-		out.DrawImage new Bitmap("res\\bg.jpg"), 0, 0, result.Width, result.Height
+		out.DrawImage new Bitmap("res/auxiliary/bg.jpg"), 0, 0, result.Width, result.Height
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
 		# Header drawing.
 		hdrbrush = new SolidBrush(@set_alpha @color_code[player.class])
@@ -226,7 +230,7 @@ class TermEmu
 		# Init setup.
 		@win										= new System.Windows.Forms.Form()
 		@win.Controls.Add(@out						= new System.Windows.Forms.RichTextBox())
-		[@win.Width, @win.Height, @win.Icon]		= [790, 700, new Icon('res\\siralim.ico')]
+		[@win.Width, @win.Height, @win.Icon]		= [790, 700, new Icon('res/auxiliary/siralim.ico')]
 		[@out.Width, @out.Height, @out.ReadOnly]	= [@win.Width, @win.Height, true]
 		@out.Dock			= System.Windows.Forms.DockStyle.Fill
 		@out.BorderStyle	= System.Windows.Forms.BorderStyle.None
@@ -234,7 +238,7 @@ class TermEmu
 		@win.Text			= System.Console.Title
 		# Custom font addition.
 		collect				= new Text.PrivateFontCollection()
-		collect.AddFontFile("res\\TerminalVector.ttf")
+		collect.AddFontFile("res/fonts/TerminalVector.ttf")
 		@out.Font			= new Font collect.Families.GetValue(0), 12, FontStyle.Regular, GraphicsUnit.Pixel
 		# Finalization.
 		@win.StartPosition	= System.Windows.Forms.FormStartPosition.CenterScreen
@@ -245,8 +249,6 @@ class TermEmu
 			[@out.SelectionStart, @out.SelectionColor] = [@out.TextLength, @fg]
 			@out.AppendText line + (if idx < lines.length-1 then '\n' else '')
 		System.Windows.Forms.Application.DoEvents()
-		
-	set_fg: (color) ->
 
 	wait_for: (ms) ->
 		timer			= new System.Windows.Forms.Timer()
@@ -337,9 +339,9 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-#try 
-ui = new CUI
-feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
-new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
-#catch ex then ui.fail(ex)
+try 
+	ui = new CUI
+	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
+	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
+catch ex then ui.fail(ex)
 ui.done()
