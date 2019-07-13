@@ -58,6 +58,7 @@ class SiralimData
 
 	crit_data: (fragment) ->
 		# Init setup.
+		console.log fragment
 		[stats, naming, spec]	= [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
 		art_start				= fragment.findIndex (x) -> x.startsWith "Artifact: "
 		art_data = if art_start isnt -1 then fragment.splice(art_start,fragment.indexOf("",art_start)-art_start) else []
@@ -330,9 +331,9 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-#try 
-ui = new CUI
-feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
-new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
-#catch ex then ui.fail(ex)
+try 
+	ui = new CUI
+	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
+	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
+catch ex then ui.fail(ex)
 ui.done()
