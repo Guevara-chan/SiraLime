@@ -226,16 +226,14 @@ class TermEmu
 		# Custom font addition.
 		collect				= new Text.PrivateFontCollection()
 		collect.AddFontFile("res\\TerminalVector.ttf")
-		@out.Font			= new Font collect.Families.GetValue(0), 12, FontStyle.Regular,
-			GraphicsUnit.Pixel
+		@out.Font			= new Font collect.Families.GetValue(0), 12, FontStyle.Regular, GraphicsUnit.Pixel
 		# Finalization.
 		@win.StartPosition	= System.Windows.Forms.FormStartPosition.CenterScreen
 		@win.Show()
 
 	echo: (txt) ->
 		for line, idx in lines = txt.split('\n')
-			@out.SelectionStart = @out.TextLength
-			@out.SelectionColor = @fg
+			[@out.SelectionStart, @out.SelectionColor] = [@out.TextLength, @fg]
 			@out.AppendText line + (if idx < lines.length-1 then '\n' else '')
 		System.Windows.Forms.Application.DoEvents()
 		
