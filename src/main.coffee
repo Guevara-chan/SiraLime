@@ -215,8 +215,8 @@ class TermEmu
 	# --Methods goes here.
 	constructor: () ->
 		# Init setup.
-		@win = new System.Windows.Forms.Form()
-		@win.Controls.Add(@out = new System.Windows.Forms.RichTextBox())
+		@win										= new System.Windows.Forms.Form()
+		@win.Controls.Add(@out						= new System.Windows.Forms.RichTextBox())
 		[@win.Width, @win.Height, @win.Icon]		= [790, 700, new Icon('res\\siralim.ico')]
 		[@out.Width, @out.Height, @out.ReadOnly]	= [@win.Width, @win.Height, true]
 		@out.Dock			= System.Windows.Forms.DockStyle.Fill
