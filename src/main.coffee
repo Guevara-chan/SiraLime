@@ -194,23 +194,23 @@ class Render
 		@bmp.Save(dest, Imaging.ImageFormat.Png) if dest
 # -------------------
 class TermEmu
-	colors: [0x000000, #Black = 0
-				0x000090, #DarkBlue = 1
-				0x009000, #DarkGreen = 2
-				0x009090, #DarkCyan = 3
-				0x900000, #DarkRed = 4
-				0x900090, #DarkMagenta = 5
-				0x909000, #DarkYellow = 6
-				0xC0C0C0, #Gray = 7
-				0x808080, #DarkGray = 8
-				0x0000FF, #Blue = 9
-				0x00FF00, #Green = 10
-				0x00FFFF, #Cyan = 11
-				0xFF0000, #Red = 12
-				0xFF00FF, #Magenta = 13
-				0xFFFF00, #Yellow = 14
-				0xFFFFFF  #White = 15
-			]
+	colors:
+		Black:		0x000000
+		DarkBlue:	0x000090
+		DarkGreen:	0x009000
+		DarkCyan:	0x009090
+		DarkRed:	0x900000
+		DarkMegenta:0x900090
+		DarkYellow:	0x909000
+		Gray:		0xC0C0C0
+		DarkGray:	0x808080
+		Blue:		0x0000FF
+		Green:		0x00FF00
+		Cyan:		0x00FFFF
+		Red:		0xFF0000
+		Magenta:	0xFF00FF
+		Yellow:		0xFFFF00
+		White:		0xFFFFFF
 
 	# --Methods goes here.
 	constructor: () ->
@@ -238,7 +238,8 @@ class TermEmu
 		System.Windows.Forms.Application.DoEvents()
 		
 	set_fg: (color) ->
-		@fg = Color.FromArgb @colors[System.Convert.ChangeType(System.ConsoleColor[color], System.Int32)]
+		@fg = Color.FromArgb switch typeof color
+			when 'string' then @colors[color]
 
 	wait_for: (ms) ->
 		timer			= new System.Windows.Forms.Timer()
