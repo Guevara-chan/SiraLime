@@ -103,7 +103,13 @@ class Render
 
 	# --Methods goes here.
 	constructor: (s3data, pipe, show_off, dest = 'last.png') ->
-		@bmp = show_off @render pipe s3data
+		# Init setup.
+		customfonts = new Text.PrivateFontCollection()
+		customfonts.AddFontFile("res\\Dosis-SemiBold.ttf")
+		@fonts		=
+			Dosis: customfonts.Families.GetValue(0)
+		# Actual render.
+		@bmp		= show_off @render pipe s3data
 		@save(dest)
 
 	print_centered: (out, txt, font, x, y, color) ->
@@ -136,7 +142,7 @@ class Render
 			header:	scale * 15
 		result		= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
 		out			= Graphics.FromImage(result)
-		capfont		= make_font "Sylfaen", 7.5
+		capfont		= make_font @fonts.Dosis, 7.5
 		traitfont	= make_font "Sylfaen", 6.5
 		hdrfont		= make_font "Impact", 7.5
 		subhdrfont	= make_font "Impact", 6
@@ -331,9 +337,9 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-try 
-	ui = new CUI
-	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
-	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
-catch ex then ui.fail(ex)
+#try 
+ui = new CUI
+feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
+new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
+#catch ex then ui.fail(ex)
 ui.done()
