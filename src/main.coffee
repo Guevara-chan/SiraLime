@@ -250,9 +250,9 @@ class TermEmu
 
 	# --Properties goes here.
 	@getter 'fg', (val) -> @fg_
-	@setter 'fg', (val)	->
-		@fg_ = Color.FromArgb switch typeof val
-			when 'string' then @colors[val]
+	@setter 'fg', (val)	-> @fg_ = Color.FromArgb switch typeof val
+		when 'string' then @colors[val]
+		when 'object' then @colors[val.ToString()]
 # -------------------
 class CUI
 	color_code:
@@ -331,9 +331,9 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-try 
-	ui = new CUI
-	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
-	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
-catch ex then ui.fail(ex)
+#try 
+ui = new CUI
+feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
+new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
+#catch ex then ui.fail(ex)
 ui.done()
