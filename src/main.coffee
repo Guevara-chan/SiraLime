@@ -5,6 +5,8 @@ header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
 """
+Function::getter = (name, proc)	-> Reflect.defineProperty @prototype, name, {get: proc, configurable: true}
+Function::setter = (name, proc)	-> Reflect.defineProperty @prototype, name, {set: proc, configurable: true}
 clr = require('clr').init assemblies: 'System|mscorlib|System.Drawing|System.Windows.Forms|PresentationCore'.split '|'
 Object.assign global, namespace for namespace in [System.Drawing]
 
@@ -238,8 +240,6 @@ class TermEmu
 		System.Windows.Forms.Application.DoEvents()
 		
 	set_fg: (color) ->
-		@fg = Color.FromArgb switch typeof color
-			when 'string' then @colors[color]
 
 	wait_for: (ms) ->
 		timer			= new System.Windows.Forms.Timer()
@@ -247,6 +247,12 @@ class TermEmu
 		timer.Tick.add	(e) -> System.Windows.Forms.Application.Exit()
 		timer.Start()
 		System.Windows.Forms.Application.Run()
+
+	# --Properties goes here.
+	@getter 'fg', (val) -> @fg_
+	@setter 'fg', (val)	->
+		@fg_ = Color.FromArgb switch typeof val
+			when 'string' then @colors[val]
 # -------------------
 class CUI
 	color_code:
@@ -311,7 +317,7 @@ class CUI
 			[txt, color] = [arguments[arg++], arguments[arg++]]
 			if color?
 				System.Console.ForegroundColor = System.ConsoleColor[SiralimData.capitalize color]
-				@emu?.set_fg SiralimData.capitalize color
+				@emu?.fg = SiralimData.capitalize color
 			@out txt
 		@out()
 
