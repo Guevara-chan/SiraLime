@@ -204,22 +204,22 @@ class Render
 # -------------------
 class TermEmu
 	colors:
-		Black:		0x000000
-		DarkBlue:	0x000090
-		DarkGreen:	0x009000
-		DarkCyan:	0x009090
-		DarkRed:	0x900000
-		DarkMegenta:0x900090
-		DarkYellow:	0x909000
-		Gray:		0xC0C0C0
-		DarkGray:	0x808080
-		Blue:		0x0000FF
-		Green:		0x00FF00
-		Cyan:		0x00FFFF
-		Red:		0xFF0000
-		Magenta:	0xFF00FF
-		Yellow:		0xFFFF00
-		White:		0xFFFFFF
+		Black:			0x000000
+		DarkBlue:		0x000090
+		DarkGreen:		0x009000
+		DarkCyan:		0x009090
+		DarkRed:		0x900000
+		DarkMegenta:	0x900090
+		DarkYellow:		0x909000
+		Gray:			0xC0C0C0
+		DarkGray:		0x808080
+		Blue:			0x0000FF
+		Green:			0x00FF00
+		Cyan:			0x00FFFF
+		Red:			0xFF0000
+		Magenta:		0xFF00FF
+		Yellow:			0xFFFF00
+		White:			0xFFFFFF
 
 	# --Methods goes here.
 	constructor: () ->
