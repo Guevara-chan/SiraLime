@@ -16,5 +16,5 @@ It requires .NET 4.5 framework, [NodeJS 12+](https://nodejs.org/en/download/curr
 
 # :.Brief sampling of Me and the Boys.:
 ![image](https://user-images.githubusercontent.com/8768470/61166435-0b6caf80-a536-11e9-80a4-13eb476371e6.png)
-![image](https://user-images.githubusercontent.com/8768470/60759542-78acac00-a02f-11e9-8a9f-3a5e952dae94.png)
+![image](https://user-images.githubusercontent.com/8768470/61176047-c478cb80-a5c2-11e9-9faa-74533393b192.png)
 ![image](https://user-images.githubusercontent.com/8768470/60759525-43a05980-a02f-11e9-9c85-b4b8c62e489e.png)
