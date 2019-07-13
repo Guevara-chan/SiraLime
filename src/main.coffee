@@ -59,6 +59,7 @@ class SiralimData
 		[stats, naming, spec]	= [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
 		art_start				= fragment.findIndex (x) -> x.startsWith "Artifact: "
 		art_data = if art_start isnt -1 then fragment.splice(art_start,fragment.indexOf("",art_start)-art_start) else []
+
 		# Other stats.
 		singular:	if naming[naming.length-1] is '(Singular)'	then naming.pop(); true else false
 		nether:		if naming[naming.length-1] is '(Nether)'	then naming.pop(); true else false
@@ -70,8 +71,8 @@ class SiralimData
 		aura:		@get_field(fragment, "Nether Aura: Nether Aura") ? ""
 		nethtraits:	@get_list(fragment, /Nether Trait: (.*)/)
 		gems:		@get_list(fragment, /Gem of (.*) \(Mana/)
-		stats:		(Object.assign stats,
-			{[stat]: BigInt @get_field fragment, SiralimData.capitalize(stat) + '( \\(.*\\))?'} for stat in [
+		stats:		(Object.assign(stats,
+			{[stat]: BigInt @get_field fragment, SiralimData.capitalize(stat) + '( \\(.*\\))?'}) for stat in [
 				'health', 'mana', 'attack', 'intelligence', 'defense', 'speed'])[0]
 		art:
 			name:	@get_field(art_data, "Artifact") ? ""
@@ -324,7 +325,6 @@ class CUI
 #.}
 
 # --Main code--
-System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false)
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
 try 
 	ui = new CUI
