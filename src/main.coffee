@@ -115,15 +115,18 @@ class Render
 		@bmp		= show_off @render pipe s3data
 		@save(dest) if @bmp
 
+	txt:
+		width: (txt, font) ->
+			TR.MeasureText(txt, font).Width
+		height: (txt, font) ->
+			TR.MeasureText(txt, font).Height
+
 	print_centered: (out, txt, font, x, y, color) ->
-		TR.DrawText out, txt, font, new Point(x - TR.MeasureText(txt, font).Width / 2, y), color
+		TR.DrawText out, txt, font, new Point(x - @txt.width(txt, font) / 2, y), color
 
 	draw_block: (out, x, y, width, height, pen, brush) ->
 		out.FillRectangle brush, x, y, width, height
 		out.DrawRectangle pen, x, y, width, height
-
-	set_alpha: (color, a = 40) ->
-		Color.FromArgb(a, color.R, color.G, color.B)
 
 	grayscale: (level, a = 255) ->
 		Color.FromArgb(a, level, level, level)
@@ -160,8 +163,8 @@ class Render
 		out.DrawImage new Bitmap("res/auxiliary/bg.jpg"), 0, 0, result.Width, result.Height
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
 		# Header drawing.
-		hdrbrush = new SolidBrush(@set_alpha @color_code[player.class])
-		@draw_block out, 0, 0, grid.xres, grid.header-3, bgpen, new SolidBrush(@set_alpha @color_code[player.class])
+		hdrbrush = new SolidBrush(Color.FromArgb 40, @color_code[player.class])
+		@draw_block out,0,0,grid.xres,grid.header-3,bgpen,new SolidBrush(Color.FromArgb 40, @color_code[player.class])
 		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header - 1.5 * scale, bgpen, hdrbrush 
 		@print_centered out, "#{player.name}", hdrfont,	grid.xres * 0.5, -scale, Color.Coral
 		@print_centered out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.4, Color.Chocolate
@@ -184,22 +187,23 @@ class Render
 			out.DrawImage crit.sprite, x, y, grid.xres, grid.yres
 			out.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
 			if crit.nether
-				out.FillEllipse new SolidBrush(@set_alpha @color_code[crit.class], 110), 
+				out.FillEllipse new SolidBrush(Color.FromArgb 110, @color_code[crit.class]), 
 					x + 2.75 * scale, y + 3 * scale, 5 * scale, 5.5 * scale
-				TR.DrawText out, "★", make_font("Sylfaen",8,FontStyle.Bold),new Point(x,y),@color_code[crit.class]
+				TR.DrawText out, "★", make_font("Sylfaen", 8, FontStyle.Bold), new Point(x,y), @color_code[crit.class]
 			# Name drawing.
 			[text, factor] = ["#{crit.name}", 0.93]
-			prewidth = TR.MeasureText(text, capfont).Width*factor
+			prewidth = @txt.width(text, capfont) * factor
 			nfont = if prewidth > 125 then make_font(capfont.FontFamily.Name, 7.5 - 0.08 * (prewidth-125)) else capfont
-			cap	= {width: (TR.MeasureText(text, nfont)).Width*factor, height: (TR.MeasureText(text, capfont)).Height}
+			cap	= {width: @txt.width(text, nfont) * factor, height: @txt.height(text, capfont)}
 			[cap.x,cap.y] = [x + (grid.xres-cap.width) / 2, y + grid.yres]
-			text_y = cap.y + (cap.height-TR.MeasureText(text, nfont).Height) / 2
-			@draw_block out,cap.x,cap.y,cap.width,cap.height,cappen,new SolidBrush @set_alpha @color_code[crit.class],30
+			text_y = cap.y + (cap.height - @txt.height text, nfont) / 2
+			@draw_block out,cap.x,cap.y,cap.width,cap.height,cappen,
+				new SolidBrush Color.FromArgb 30, @color_code[crit.class]
 			@print_centered out, text, nfont, grid.xres * (idx % 3 + 0.5), text_y, @color_code[crit.class]
 			# Additional trait drawing.
 			if crit.art.trait
 				[yoff, xoff, twidth] = [cap.y+cap.height, grid.xres * (idx % 3 + 0.5)]
-				twidth = TR.MeasureText(crit.art.trait, traitfont).Width * 0.96
+				twidth = @txt.width(crit.art.trait, traitfont) * 0.96
 				@draw_block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height * 0.7,
 					cappen, new SolidBrush @grayscale(40, 200)
 				@print_centered out, crit.art.trait, traitfont, xoff, yoff-scale, @grayscale(160)
