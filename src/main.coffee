@@ -138,6 +138,7 @@ class Render
 			#console.log size
 			new Font @fonts[family], scale * size, style, System.Drawing.GraphicsUnit.Pixel
 		# Init setup.
+		return if s3data.team.length is 0
 		{player, team}	= s3data
 		grid =
 			xres:	scale * team[0].sprite.Width
@@ -310,7 +311,8 @@ class CUI
 		return s3data
 
 	show_off: (img) ->
-		@say("\nWork complete: image successfully pasted to clipboard !", 'green')
+		if img then @say("\nWork complete: image successfully pasted to clipboard !", 'green')
+		else @say("\nWork aborted: no creatures to render was found.", 'red')
 		return img
 
 	plural: (word, num, concat = true) ->
