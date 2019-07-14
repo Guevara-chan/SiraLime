@@ -34,7 +34,7 @@ class SiralimData
 		field: (feed, field) ->
 			matcher = new RegExp field + ": (.*)"
 			idx = feed?.findIndex((elem) -> matcher.test elem)
-			feed.splice(idx, 1)[0].match(matcher)[-1..][0] if idx != -1		
+			feed.splice(idx, 1)[0].match(matcher).pop() if idx != -1		
 		list: (feed, matcher) ->
 			feed.filter((x) -> matcher.test x).map((x) -> x.match(matcher)[1])
 
