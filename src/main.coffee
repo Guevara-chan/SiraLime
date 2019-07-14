@@ -116,7 +116,7 @@ class Render
 		@save(dest) if @bmp
 
 	print_centered: (out, txt, font, x, y, color) ->
-		TR.DrawText out, txt, font, new Point(x - (TR.MeasureText(txt, font).Width / 2)+1, y), color
+		TR.DrawText out, txt, font, new Point(x - TR.MeasureText(txt, font).Width / 2, y), color
 
 	draw_block: (out, x, y, width, height, pen, brush) ->
 		out.FillRectangle brush, x, y, width, height
@@ -188,11 +188,14 @@ class Render
 					x + 2.75 * scale, y + 3 * scale, 5 * scale, 5.5 * scale
 				TR.DrawText out, "★", make_font("Sylfaen",8,FontStyle.Bold),new Point(x,y),@color_code[crit.class]
 			# Name drawing.
-			text = "#{crit.name}"#" lvl#{crit.level}"
-			cap	= {width: (TR.MeasureText(text, capfont)).Width*0.93, height: (TR.MeasureText(text, capfont)).Height}
+			[text, factor] = ["#{crit.name}", 0.93]
+			prewidth = TR.MeasureText(text, capfont).Width*factor
+			nfont = if prewidth > 125 then make_font(capfont.FontFamily.Name, 7.5 - 0.08 * (prewidth-125)) else capfont
+			cap	= {width: (TR.MeasureText(text, nfont)).Width*factor, height: (TR.MeasureText(text, capfont)).Height}
 			[cap.x,cap.y] = [x + (grid.xres-cap.width) / 2, y + grid.yres]
+			text_y = cap.y + (cap.height-TR.MeasureText(text, nfont).Height) / 2
 			@draw_block out,cap.x,cap.y,cap.width,cap.height,cappen,new SolidBrush @set_alpha @color_code[crit.class],30
-			@print_centered out, text, capfont, grid.xres * (idx % 3 + 0.5), cap.y, @color_code[crit.class]
+			@print_centered out, text, nfont, grid.xres * (idx % 3 + 0.5), text_y, @color_code[crit.class]
 			# Additional trait drawing.
 			if crit.art.trait
 				[yoff, xoff, twidth] = [cap.y+cap.height, grid.xres * (idx % 3 + 0.5)]
