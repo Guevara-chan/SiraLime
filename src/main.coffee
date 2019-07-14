@@ -15,7 +15,7 @@ class SiralimData
 	source_cache = "cache.txt"
 
 	# --Methods goes here.
-	constructor:  (src = System.IO.File.ReadAllText source_cache) ->
+	constructor: (src = System.IO.File.ReadAllText source_cache) ->
 		# Main parser.
 		feed = src.split('\r\n')
 		if feed[0] is '========== CHARACTER ==========' # If header is valid...
