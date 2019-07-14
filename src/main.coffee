@@ -114,7 +114,7 @@ class Render
 			Sylfaen:	customfonts.Families.GetValue(2)
 		# Actual render.
 		@bmp		= show_off @render pipe s3data
-		@save(dest)
+		@save(dest) if @bmp
 
 	print_centered: (out, txt, font, x, y, color) ->
 		TR.DrawText out, txt, font, new Point(x - (TR.MeasureText(txt, font).Width / 2)+1, y), color
