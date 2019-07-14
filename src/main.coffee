@@ -30,28 +30,28 @@ class SiralimData
 	@capitalize: (txt) ->
 		txt[0].toUpperCase() + txt[1..]
 
-	get_field: (feed, field) ->
-		matcher = new RegExp field + ": (.*)"
-		idx = feed?.findIndex((elem) -> matcher.test elem)
-		feed.splice(idx, 1)[0].match(matcher)[-1..][0] if idx != -1		
-
-	get_list: (feed, matcher) ->
-		feed.filter((x) -> matcher.test x).map((x) -> x.match(matcher)[1])
+	get:
+		field: (feed, field) ->
+			matcher = new RegExp field + ": (.*)"
+			idx = feed?.findIndex((elem) -> matcher.test elem)
+			feed.splice(idx, 1)[0].match(matcher)[-1..][0] if idx != -1		
+		list: (feed, matcher) ->
+			feed.filter((x) -> matcher.test x).map((x) -> x.match(matcher)[1])
 
 	player_data: (fragment) ->
 		# Init setup.
 		headline	= fragment[0].match(/([\w\s]+) (.*), Level (\d*) (\w*) Mage/)
 		perkfinder	= /(.*) \(Rank (\d*)(?: \/ )(\d*)?\)/
-		achievments	= @get_field(fragment, "Achievement Points").split(' ')
+		achievments	= @get.field(fragment, "Achievement Points").split(' ')
 		# Actual extraction.
 		title:		headline[1]
 		name:		headline[2]
 		level:		BigInt headline[3]
 		class:		headline[4]
-		played:		@get_field(fragment, "Time Played")
-		version:	@get_field(fragment, "Game Version")
-		dpoints:	BigInt @get_field(fragment, "Total Deity Points")
-		runes:		@get_list(fragment, /(\w*) Rune:/)
+		played:		@get.field(fragment, "Time Played")
+		version:	@get.field(fragment, "Game Version")
+		dpoints:	BigInt @get.field(fragment, "Total Deity Points")
+		runes:		@get.list(fragment, /(\w*) Rune:/)
 		achievs:	{got: parseInt(achievments[0]), total: parseInt(achievments[2]), progress: achievments[3]}
 		perks:		fragment.filter((x) -> perkfinder.test x).map (x) ->
 			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
@@ -70,15 +70,15 @@ class SiralimData
 		kind:		spec[1]
 		class:		spec[2]
 		sprite:		@load_sprite(name)
-		aura:		@get_field(fragment, "Nether Aura: Nether Aura") ? ""
-		nethtraits:	@get_list(fragment, /Nether Trait: (.*)/)
-		gems:		@get_list(fragment, /Gem of (.*) \(Mana/)
+		aura:		@get.field(fragment, "Nether Aura: Nether Aura") ? ""
+		nethtraits:	@get.list(fragment, /Nether Trait: (.*)/)
+		gems:		@get.list(fragment, /Gem of (.*) \(Mana/)
 		stats:		(Object.assign(stats,
-			{[stat]: BigInt @get_field fragment, SiralimData.capitalize(stat) + '( \\(.*\\))?'}) for stat in [
+			{[stat]: BigInt @get.field fragment, SiralimData.capitalize(stat) + '( \\(.*\\))?'}) for stat in [
 				'health', 'mana', 'attack', 'intelligence', 'defense', 'speed'])[0]
 		art:
-			name:	@get_field(art_data, "Artifact") ? ""
-			trait:	@get_field(art_data, "Trait") ? ""
+			name:	@get.field(art_data, "Artifact") ? ""
+			trait:	@get.field(art_data, "Trait") ? ""
 			mods:	art_data
 
 	load_sprite: (crit_name) ->
@@ -115,18 +115,18 @@ class Render
 		@bmp		= show_off @render pipe s3data
 		@save(dest) if @bmp
 
-	txt:
+	txt: txt =
 		width: (txt, font) ->
 			TR.MeasureText(txt, font).Width
 		height: (txt, font) ->
 			TR.MeasureText(txt, font).Height
 
-	print_centered: (out, txt, font, x, y, color) ->
-		TR.DrawText out, txt, font, new Point(x - @txt.width(txt, font) / 2, y), color
-
-	draw_block: (out, x, y, width, height, pen, brush) ->
-		out.FillRectangle brush, x, y, width, height
-		out.DrawRectangle pen, x, y, width, height
+	draw:
+		block: (out, x, y, width, height, pen, brush) ->
+			out.FillRectangle brush, x, y, width, height
+			out.DrawRectangle pen, x, y, width, height
+		text: (out, text, font, x, y, color) ->
+			TR.DrawText out, text, font, new Point(x - txt.width(text, font) / 2, y), color
 
 	grayscale: (level, a = 255) ->
 		Color.FromArgb(a, level, level, level)
@@ -164,19 +164,18 @@ class Render
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
 		# Header drawing.
 		hdrbrush = new SolidBrush(Color.FromArgb 40, @color_code[player.class])
-		@draw_block out,0,0,grid.xres,grid.header-3,bgpen,new SolidBrush(Color.FromArgb 40, @color_code[player.class])
-		@draw_block out, result.Width - grid.xres, 0, grid.xres, grid.header - 1.5 * scale, bgpen, hdrbrush 
-		@print_centered out, "#{player.name}", hdrfont,	grid.xres * 0.5, -scale, Color.Coral
-		@print_centered out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.4, Color.Chocolate
-		@print_centered out, "#{player.class} Mage", subhdrfont, grid.xres * 2.5, -scale, 
-			@saturate @color_code[player.class]
-		@print_centered out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.32, @color_code[player.class]
+		@draw.block out,0,0,grid.xres,grid.header-3,bgpen,new SolidBrush(Color.FromArgb 40, @color_code[player.class])
+		@draw.block out, result.Width - grid.xres, 0, grid.xres, grid.header - 1.5 * scale, bgpen, hdrbrush 
+		@draw.text out, "#{player.name}", hdrfont,	grid.xres * 0.5, -scale, Color.Coral
+		@draw.text out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.4, Color.Chocolate
+		@draw.text out, "#{player.class} Mage", subhdrfont, grid.xres * 2.5, -scale, @saturate @color_code[player.class]
+		@draw.text out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.32, @color_code[player.class]
 		# Runes drawing.
-		@print_centered out, player.runes.join('|'), make_font("Sylfaen", 7), grid.xres * 1.5, -2, @grayscale 135
-		@print_centered out, player.played,make_font("Impact",5.5),grid.xres*1.25,scale*7.5,@saturate Color.Coral,0.5
+		@draw.text out, player.runes.join('|'), make_font("Sylfaen", 7), grid.xres * 1.5, -2, @grayscale 135
+		@draw.text out, player.played,make_font("Impact",5.5),grid.xres*1.25,scale*7.5,@saturate Color.Coral,0.5
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
 		# Clock and achievments.
-		@print_centered out, player.achievs.got+"/"+player.achievs.total, make_font("Impact", 5.5), grid.xres * 1.75, 
+		@draw.text out, player.achievs.got+"/"+player.achievs.total, make_font("Impact", 5.5), grid.xres * 1.75, 
 			scale * 7.5, Color.FromArgb(120, 120, 0)
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.5, grid.caption * 0.4, grid.xres * 1.5, grid.caption * 0.75
 		# Crits drawing.
@@ -197,16 +196,16 @@ class Render
 			cap	= {width: @txt.width(text, nfont) * factor, height: @txt.height(text, capfont)}
 			[cap.x,cap.y] = [x + (grid.xres-cap.width) / 2, y + grid.yres]
 			text_y = cap.y + (cap.height - @txt.height text, nfont) / 2
-			@draw_block out,cap.x,cap.y,cap.width,cap.height,cappen,
+			@draw.block out,cap.x,cap.y,cap.width,cap.height,cappen,
 				new SolidBrush Color.FromArgb 30, @color_code[crit.class]
-			@print_centered out, text, nfont, grid.xres * (idx % 3 + 0.5), text_y, @color_code[crit.class]
+			@draw.text out, text, nfont, grid.xres * (idx % 3 + 0.5), text_y, @color_code[crit.class]
 			# Additional trait drawing.
 			if crit.art.trait
 				[yoff, xoff, twidth] = [cap.y+cap.height, grid.xres * (idx % 3 + 0.5)]
 				twidth = @txt.width(crit.art.trait, traitfont) * 0.96
-				@draw_block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height * 0.7,
+				@draw.block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height * 0.7,
 					cappen, new SolidBrush @grayscale(40, 200)
-				@print_centered out, crit.art.trait, traitfont, xoff, yoff-scale, @grayscale(160)
+				@draw.text out, crit.art.trait, traitfont, xoff, yoff-scale, @grayscale(160)
 		return result
 
 	save: (dest) =>		
@@ -347,9 +346,9 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-try 
-	ui = new CUI
-	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
-	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
-catch ex then ui.fail(ex)
+#try 
+ui = new CUI
+feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
+new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
+#catch ex then ui.fail(ex)
 ui.done()
