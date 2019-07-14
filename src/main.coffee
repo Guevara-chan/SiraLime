@@ -58,7 +58,6 @@ class SiralimData
 
 	crit_data: (fragment) ->
 		# Init setup.
-		console.log fragment
 		[stats, naming, spec]	= [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
 		art_start				= fragment.findIndex (x) -> x.startsWith "Artifact: "
 		art_data = if art_start isnt -1 then fragment.splice(art_start,fragment.indexOf("",art_start)-art_start) else []
@@ -233,9 +232,9 @@ class TermEmu
 		@win.Controls.Add(@out						= new System.Windows.Forms.RichTextBox())
 		[@win.Width, @win.Height, @win.Icon]		= [790, 700, new Icon('res/auxiliary/siralim.ico')]
 		[@out.Width, @out.Height, @out.ReadOnly]	= [@win.Width, @win.Height, true]
+		[@out.BackColor, @out.WordWrap]				= [Color.Black, false]
 		@out.Dock			= System.Windows.Forms.DockStyle.Fill
 		@out.BorderStyle	= System.Windows.Forms.BorderStyle.None
-		@out.BackColor		= Color.Black
 		@win.Text			= System.Console.Title
 		# Custom font addition.
 		collect				= new Text.PrivateFontCollection()
@@ -296,7 +295,7 @@ class CUI
 			(if crit.nethtraits.length then '\n│' + (if crit.art.name then '│' else ' ') else ""), 'white',
 			(if crit.nethtraits.length then '╙─' else ""), @color_code[crit.class],
 			crit.nethtraits.join(' // '), 'yellow')
-			if crit.art.mods isnt [] # Printing artifact modifiers now:
+			if crit.art.name # Printing artifact modifiers now:
 				@say '│╘', 'white', '▒', 'darkYellow', ": ", 'white', crit.art.name, 'darkYellow'
 				last = ""
 				for mod in crit.art.mods
