@@ -42,7 +42,7 @@ class SiralimData
 		# Init setup.
 		headline	= fragment[0].match(/([\w\s]+) (.*), Level (\d*) (\w*) Mage/)
 		perkfinder	= /(.*) \(Rank (\d*)(?: \/ )(\d*)?\)/
-		achievments	= @get.field(fragment, "Ahievement Points").split(' ')
+		achievments	= @get.field(fragment, "Achievement Points").split(' ')
 		# Actual extraction.
 		title:		headline[1]
 		name:		headline[2]
@@ -334,7 +334,7 @@ class CUI
 		@out()
 
 	fail: (ex) ->
-		@say "FAIL:: #{ex.stack}", 'red'
+		@say "FAIL:: #{ex.stack.split('\n')[0..-16].join('\n')}", 'red'
 
 	done: (lapse = 3000) ->
 		[System.Console.ForegroundColor, System.Console.BackgroundColor] = [@fg, @bg]
