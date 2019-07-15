@@ -42,7 +42,7 @@ class SiralimData
 		# Init setup.
 		headline	= fragment[0].match(/([\w\s]+) (.*), Level (\d*) (\w*) Mage/)
 		perkfinder	= /(.*) \(Rank (\d*)(?: \/ )(\d*)?\)/
-		achievments	= @get.field(fragment, "Achievement Points").split(' ')
+		achievments	= @get.field(fragment, "Ahievement Points").split(' ')
 		# Actual extraction.
 		title:		headline[1]
 		name:		headline[2]
@@ -334,7 +334,7 @@ class CUI
 		@out()
 
 	fail: (ex) ->
-		@say "FAIL:: #{ex}", 'red'
+		@say "FAIL:: #{ex.stack}", 'red'
 
 	done: (lapse = 3000) ->
 		[System.Console.ForegroundColor, System.Console.BackgroundColor] = [@fg, @bg]
@@ -346,7 +346,7 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-try 
+try
 	ui = new CUI
 	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
 	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
