@@ -45,7 +45,7 @@ class SiralimData
 		achievments	= @get.field(fragment, "Achievement Points").split(' ')
 		# Title & name analyzis.
 		parts = headline[1].split ' '
-		[name, title] = if parts.length > 2 and parts[1] = "th!" then [parts[0], parts[1..].join(' ')]
+		[name, title] = if parts.length > 2 and parts[1] is "th!" then [parts[0], parts[1..].join(' ')]
 		else [parts.pop(), parts.join(' ')]
 		# Actual extraction.
 		title:		title
@@ -350,9 +350,9 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-#try
-ui = new CUI
-feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
-new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
-#catch ex then ui.fail(ex)
+try
+	ui = new CUI
+	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
+	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
+catch ex then ui.fail(ex)
 ui.done()
