@@ -140,7 +140,6 @@ class Render
 	render: (s3data, scale = 2) ->
 		# Aux procedure.
 		make_font = (family, size, style = FontStyle.Regular) =>
-			#console.log size
 			new Font @fonts[family], scale * size, style, System.Drawing.GraphicsUnit.Pixel
 		# Init setup.
 		return if s3data.team.length is 0
@@ -243,7 +242,6 @@ class TermEmu
 		[@out.Width, @out.Height, @out.ReadOnly]	= [@win.Width, @win.Height, true]
 		[@out.BackColor, @out.WordWrap, @out.MultiLine]	= [Color.Black, false, true]
 		@out.Dock			= System.Windows.Forms.DockStyle.Fill
-		console.log @win.BorderStyle
 		@out.BorderStyle	= System.Windows.Forms.BorderStyle.None
 		@win.Text			= System.Console.Title
 		# Custom font addition.
@@ -350,8 +348,8 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-try
-	ui = new CUI
+ui = new CUI
+try	
 	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
 	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
 catch ex then ui.fail(ex)
