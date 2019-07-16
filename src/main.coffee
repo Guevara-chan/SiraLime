@@ -40,21 +40,25 @@ class SiralimData
 
 	player_data: (fragment) ->
 		# Init setup.
-		headline	= fragment[0].match(/([\w\s]+) (.*), Level (\d*) (\w*) Mage/)
-		perkfinder	= /(.*) \(Rank (\d*)(?: \/ )(\d*)?\)/
+		headline	= fragment[0].match(/([\w\s]+), Level (\d*) (\w*) Mage/)
+		perkfinder	= /(.*) \(Rank (\d*) \/ (\d*)\)/
 		achievments	= @get.field(fragment, "Achievement Points").split(' ')
+		# Title & name analyzis.
+		parts = headline[1].split ' '
+		[name, title] = if parts.length > 2 and parts[1] = "th!" then [parts[0], parts[1..].join(' ')]
+		else [parts.pop(), parts.join(' ')]
 		# Actual extraction.
-		title:		headline[1]
-		name:		headline[2]
-		level:		BigInt headline[3]
-		class:		headline[4]
+		title:		title
+		name:		name
+		level:		BigInt headline[2]
+		class:		headline[3]
 		played:		@get.field(fragment, "Time Played")
 		version:	@get.field(fragment, "Game Version")
 		dpoints:	BigInt @get.field(fragment, "Total Deity Points")
 		runes:		@get.list(fragment, /(\w*) Rune:/)
 		achievs:	{got: parseInt(achievments[0]), total: parseInt(achievments[2]), progress: achievments[3]}
 		perks:		fragment.filter((x) -> perkfinder.test x).map (x) ->
-			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: BigInt(arr[1]), max: arr[2]}
+			{name: (arr = perkfinder.exec(x)[1..3])[0], lvl: parseInt(arr[1]), max: parseInt(arr[2])}
 
 	crit_data: (fragment) ->
 		# Init setup.
@@ -237,7 +241,7 @@ class TermEmu
 		@win.Controls.Add(@out						= new System.Windows.Forms.RichTextBox())
 		[@win.Width, @win.Height, @win.Icon]		= [790, 700, new Icon('res/auxiliary/siralim.ico')]
 		[@out.Width, @out.Height, @out.ReadOnly]	= [@win.Width, @win.Height, true]
-		[@out.BackColor, @out.WordWrap]				= [Color.Black, false]
+		[@out.BackColor, @out.WordWrap, @out.MultiLine]	= [Color.Black, false, true]
 		@out.Dock			= System.Windows.Forms.DockStyle.Fill
 		@out.BorderStyle	= System.Windows.Forms.BorderStyle.None
 		@win.Text			= System.Console.Title
@@ -253,6 +257,7 @@ class TermEmu
 		for line, idx in lines = txt.split('\n')
 			[@out.SelectionStart, @out.SelectionColor] = [@out.TextLength, @fg]
 			@out.AppendText line + (if idx < lines.length-1 then '\n' else '')
+
 		System.Windows.Forms.Application.DoEvents()
 
 	wait_for: (ms) ->
@@ -308,7 +313,7 @@ class CUI
 				@say '│ ', 'white', '╙' + '∙'.repeat(last.length), 'darkYellow'
 		@say '└╥──', 'white', "Total deity points = #{player.dpoints}", 'Magenta'
 		@say(' ║', 'white', "#{perk.name}: ", 'darkYellow'
-			"#{perk.lvl} #{if perk.max then '/ ' + perk.max else ''}", 'darkGray') for perk in player.perks
+			"#{perk.lvl} / #{perk.max}", 'darkGray') for perk in player.perks
 		@say ' ╟─', 'white', (if player.runes then player.runes.join('/') else "No") +
 			"#{@plural 'rune', player.runes.length, false} equipped.", 'yellow'
 		@say " ╙──►Game version: #{player.version}", 'white'
@@ -345,9 +350,9 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-try
-	ui = new CUI
-	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
-	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
-catch ex then ui.fail(ex)
+#try
+ui = new CUI
+feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
+new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
+#catch ex then ui.fail(ex)
 ui.done()
