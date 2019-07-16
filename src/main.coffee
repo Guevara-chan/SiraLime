@@ -44,9 +44,9 @@ class SiralimData
 		perkfinder	= /(.*) \(Rank (\d*) \/ (\d*)\)/
 		achievments	= @get.field(fragment, "Achievement Points").split(' ')
 		# Title & name analyzis.
-		parts = headline[1].split ' '
-		[name, title] = if parts.length > 2 and parts[1] is "th!" then [parts[0], parts[1..].join(' ')]
-		else [parts.pop(), parts.join(' ')]
+		parts	= headline[1].split ' '
+		name	= (if parts.length > 2 and parts[1] is "the" then parts.splice(0, 1) else parts.pop())
+		title	= parts.join(' ')
 		# Actual extraction.
 		title:		title
 		name:		name
@@ -243,6 +243,7 @@ class TermEmu
 		[@out.Width, @out.Height, @out.ReadOnly]	= [@win.Width, @win.Height, true]
 		[@out.BackColor, @out.WordWrap, @out.MultiLine]	= [Color.Black, false, true]
 		@out.Dock			= System.Windows.Forms.DockStyle.Fill
+		console.log @win.BorderStyle
 		@out.BorderStyle	= System.Windows.Forms.BorderStyle.None
 		@win.Text			= System.Console.Title
 		# Custom font addition.
@@ -257,7 +258,6 @@ class TermEmu
 		for line, idx in lines = txt.split('\n')
 			[@out.SelectionStart, @out.SelectionColor] = [@out.TextLength, @fg]
 			@out.AppendText line + (if idx < lines.length-1 then '\n' else '')
-
 		System.Windows.Forms.Application.DoEvents()
 
 	wait_for: (ms) ->
@@ -296,15 +296,15 @@ class CUI
 			})/#{player.played}#{player.achievs.progress} parsed:",'cyan'
 		for crit in team
 			@say("├┬>", 'white', "#{crit.name} (lv#{crit.level}|#{crit.class})", @color_code[crit.class], 
-			(if crit.nether then ['[N', crit.aura].join(':')+"]" else ''), 'yellow', 
-			(if crit.art.trait then " /" else "") + crit.art.trait, 'darkYellow',
-			'\n││', 'white', '┌', @color_code[crit.class], 
-			("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray',
-			'\n│' + (if crit.art.name then '╞' else '╘'), 'white', '▒', @color_code[crit.class], ': ', 'white',
-			(if crit.gems.length then crit.gems.join ', ' else '<no gems>'), 'darkGray'
-			(if crit.nethtraits.length then '\n│' + (if crit.art.name then '│' else ' ') else ""), 'white',
-			(if crit.nethtraits.length then '╙─' else ""), @color_code[crit.class],
-			crit.nethtraits.join(' // '), 'yellow')
+				(if crit.nether then ['[N', crit.aura].join(':')+"]" else ''), 'yellow', 
+				(if crit.art.trait then " /" else "") + crit.art.trait, 'darkYellow',
+				'\n││', 'white', '┌', @color_code[crit.class], 
+				("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray',
+				'\n│' + (if crit.art.name then '╞' else '╘'), 'white', '▒', @color_code[crit.class], ': ', 'white',
+				(if crit.gems.length then crit.gems.join ', ' else '<no gems>'), 'darkGray')
+			if crit.nethtraits.length
+				@say('│' + (if crit.art.name then '│' else ' '), 'white', '╙─', @color_code[crit.class],
+					crit.nethtraits.join(' // '), 'yellow')
 			if crit.art.name # Printing artifact modifiers now:
 				@say '│╘', 'white', '▒', 'darkYellow', ": ", 'white', crit.art.name, 'darkYellow'
 				last = ""
@@ -333,9 +333,9 @@ class CUI
 	
 	say: (txt, color) ->
 		arg = 0
+		arguments[arguments.length - 2 + arguments.length % 2] += '\n'
 		while arg < arguments.length
 			@out ([txt, @color] = [arguments[arg++], SiralimData.capitalize arguments[arg++] ? ""])[0]
-		@out()
 
 	fail: (ex) ->
 		@say "FAIL:: #{ex.stack.split('\n')[0..-16].join('\n')}", 'red'
@@ -350,9 +350,9 @@ class CUI
 
 # --Main code--
 System.IO.Directory.SetCurrentDirectory "#{__dirname}\\.."
-try
-	ui = new CUI
-	feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
-	new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
-catch ex then ui.fail(ex)
+#try
+ui = new CUI
+feed = try new SiralimData System.Windows.Clipboard.GetText() catch then new SiralimData
+new Render(feed, ui.pipe.bind(ui), ui.show_off.bind(ui))
+#catch ex then ui.fail(ex)
 ui.done()
