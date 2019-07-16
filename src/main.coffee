@@ -61,7 +61,6 @@ class SiralimData
 		[stats, naming, spec]	= [{}, fragment[0].split(' '), fragment[1].match /(.*) \/ (.*)/]
 		art_start				= fragment.findIndex (x) -> x.startsWith "Artifact: "
 		art_data = if art_start isnt -1 then fragment.splice(art_start,fragment.indexOf("",art_start)-art_start) else []
-
 		# Other stats.
 		singular:	if naming[naming.length-1] is '(Singular)'	then naming.pop(); true else false
 		nether:		if naming[naming.length-1] is '(Nether)'	then naming.pop(); true else false
@@ -126,7 +125,7 @@ class Render
 			out.FillRectangle brush, x, y, width, height
 			out.DrawRectangle pen, x, y, width, height
 		text: (out, text, font, x, y, color) ->
-			TR.DrawText out, text, font, new Point(x - txt.width(text, font) / 2, y), color
+			TR.DrawText out, text, font, new Point(1 + x - txt.width(text, font) / 2, y), color
 
 	grayscale: (level, a = 255) ->
 		Color.FromArgb(a, level, level, level)
@@ -202,7 +201,7 @@ class Render
 			# Additional trait drawing.
 			if crit.art.trait
 				[yoff, xoff, twidth] = [cap.y+cap.height, grid.xres * (idx % 3 + 0.5)]
-				twidth = @txt.width(crit.art.trait, traitfont) * 0.96
+				twidth = @txt.width(crit.art.trait, traitfont) * factor
 				@draw.block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height * 0.7,
 					cappen, new SolidBrush @grayscale(40, 200)
 				@draw.text out, crit.art.trait, traitfont, xoff, yoff-scale, @grayscale(160)
