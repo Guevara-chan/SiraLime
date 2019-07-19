@@ -131,6 +131,19 @@ class Render
 		text: (out, text, font, x, y, color) ->
 			TR.DrawText out, text, font, new Point(1 + x - txt.width(text, font) / 2, y), color
 
+	alpha_blt: (out, img, x, y, width, height, a = 1) ->
+		cm = new Imaging.ColorMatrix()
+		cm.Matrix33 = a
+		ia = new Imaging.ImageAttributes()
+		ia.SetColorMatrix(cm, Imaging.ColorMatrixFlag.Default, Imaging.ColorAdjustType.Bitmap)
+		lock = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), Imaging.ImageLockMode.ReadOnly,
+			Imaging.PixelFormat.Format24bppRgb)
+		asprite = new Bitmap(img.Width, img.Height, lock.Stride, Imaging.PixelFormat.Format24bppRgb, lock.Scan0)
+		asprite.MakeTransparent asprite.GetPixel(0, 0)
+		out.DrawImage(asprite,
+				new Rectangle(x, y, width, height), 0, 0, asprite.Width, asprite.Height, 
+				GraphicsUnit.Pixel, ia)
+
 	grayscale: (level, a = 255) ->
 		Color.FromArgb(a, level, level, level)
 
@@ -149,7 +162,9 @@ class Render
 			yres:	scale * team[0].sprite.Height
 			caption:scale * 18.5
 			header:	scale * 15
-		result		= new Bitmap grid.xres * 3, grid.header + (grid.yres + grid.caption) * 2
+			xpages:	2
+			ypages: 1
+		result		= new Bitmap 1+grid.xpages*grid.xres*3, grid.header + (grid.yres + grid.caption) * 2 * grid.ypages
 		out			= Graphics.FromImage(result)
 		capfont		= make_font "Dosis", 7.5
 		traitfont	= make_font "Sylfaen", 6.5
@@ -164,10 +179,11 @@ class Render
 		bgpen.DashStyle	= Drawing2D.DashStyle.Dash
 		out.DrawImage new Bitmap("res/auxiliary/bg.jpg"), 0, 0, result.Width, result.Height
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
+		out.DrawRectangle bgpen, 0, 0, result.Width/2, result.Height+3
 		# Header drawing.
 		hdrbrush = new SolidBrush(Color.FromArgb 40, @color_code[player.class])
 		@draw.block out,0,0,grid.xres,grid.header-3,bgpen,new SolidBrush(Color.FromArgb 40, @color_code[player.class])
-		@draw.block out, result.Width - grid.xres, 0, grid.xres, grid.header - 1.5 * scale, bgpen, hdrbrush 
+		@draw.block out, grid.xres * 2, 0, grid.xres, grid.header - 1.5 * scale, bgpen, hdrbrush 
 		@draw.text out, "#{player.name}", hdrfont,	grid.xres * 0.5, -scale, Color.Coral
 		@draw.text out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.4, Color.Chocolate
 		@draw.text out, "#{player.class} Mage", subhdrfont, grid.xres * 2.5, -scale, @saturate @color_code[player.class]
@@ -186,6 +202,7 @@ class Render
 			# Sprite drawing.
 			out.SmoothingMode = Drawing2D.SmoothingMode.None
 			out.DrawImage crit.sprite, x, y, grid.xres, grid.yres
+			@alpha_blt(out, crit.sprite, 1 + x + grid.xres * 3, y, grid.xres, grid.yres, 0.3)
 			out.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
 			if crit.nether
 				out.FillEllipse new SolidBrush(Color.FromArgb 110, @color_code[crit.class]), 
@@ -208,6 +225,32 @@ class Render
 				@draw.block out, x + (grid.xres-twidth) / 2, yoff, twidth, cap.height * 0.7,
 					cappen, new SolidBrush @grayscale(40, 200)
 				@draw.text out, crit.art.trait, traitfont, xoff, yoff-scale, @grayscale(160)
+			# Aux procs for additional data drawing.			
+			tablefont = make_font "Dosis", 6
+			print_down = (text, color = @grayscale(160)) =>
+				@draw.text out, text, tablefont, 1 + x + grid.xres * 3.5, y, color
+				y += @txt.height text, tablefont
+			delim_line = (color = Color.Gold) =>
+				out.DrawLine new Pen(color), x + grid.xres * 3.05, y, x + grid.xres * 3.95, y
+			# Art and nether data drawing.
+			shorten = (txt) ->
+				for key, replacer of {
+					'Less Damage From': 'Resist'
+					'Gained In':		'Per'
+					'Increased ':		''
+					'Additional':		'Extra'
+				}
+					return txt.replace(key, replacer) if txt.indexOf(key) isnt -1
+				return txt
+			y -= grid.caption / 2
+			if crit.art.name
+				print_down "#{crit.art.name}:", Color.Gold
+				delim_line()
+				print_down shorten(mod), (if mod[0] is "*" then Color.Orange else Color.Coral) for mod in crit.art.mods
+			else print_down "<no artifact>"
+			if crit.nethtraits.length
+				delim_line()
+				print_down "★#{trait}", @color_code[crit.class] for trait in crit.nethtraits
 		return result
 
 	save: (dest) =>		
