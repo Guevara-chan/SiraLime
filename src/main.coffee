@@ -131,7 +131,7 @@ class Render
 		text: (out, text, font, x, y, color) ->
 			TR.DrawText out, text, font, new Point(1 + x - txt.width(text, font) / 2, y), color
 
-	alpha_blt: (out, img, x, y, width, height, a = 1) ->
+	alpha_blt: (out, img, x, y, width, height, a = 1, flip) ->
 		cm = new Imaging.ColorMatrix()
 		cm.Matrix33 = a
 		ia = new Imaging.ImageAttributes()
@@ -140,6 +140,7 @@ class Render
 			Imaging.PixelFormat.Format24bppRgb)
 		asprite = new Bitmap(img.Width, img.Height, lock.Stride, Imaging.PixelFormat.Format24bppRgb, lock.Scan0)
 		asprite.MakeTransparent asprite.GetPixel(0, 0)
+		asprite.RotateFlip(flip) if flip?
 		out.DrawImage(asprite,
 				new Rectangle(x, y, width, height), 0, 0, asprite.Width, asprite.Height, 
 				GraphicsUnit.Pixel, ia)
@@ -166,10 +167,10 @@ class Render
 			ypages: 1
 		result		= new Bitmap 1+grid.xpages*grid.xres*3, grid.header + (grid.yres + grid.caption) * 2 * grid.ypages
 		out			= Graphics.FromImage(result)
-		capfont		= make_font "Dosis", 7.5
-		traitfont	= make_font "Sylfaen", 6.5
-		hdrfont		= make_font "Impact", 7.5
-		subhdrfont	= make_font "Impact", 6
+		capfont		= make_font "Dosis",	7.5
+		traitfont	= make_font "Sylfaen",	6.5
+		hdrfont		= make_font "Impact",	7.5
+		subhdrfont	= make_font "Impact",	6
 		cappen		= new Pen @grayscale(10), 2
 		rbrush		= new SolidBrush @grayscale(40, 210)
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
@@ -228,6 +229,7 @@ class Render
 			# Aux procs for additional data drawing.			
 			tablefont = make_font "Dosis", 6
 			print_down = (text, color = @grayscale(160)) =>
+				back = {width: @txt.width(text), height: @txt.height(text)}
 				@draw.text out, text, tablefont, 1 + x + grid.xres * 3.5, y, color
 				y += @txt.height text, tablefont
 			delim_line = (color = Color.Gold) =>
@@ -239,8 +241,7 @@ class Render
 					'Gained In':		'Per'
 					'Increased ':		''
 					'Additional':		'Extra'
-				}
-					return txt.replace(key, replacer) if txt.indexOf(key) isnt -1
+				} then return txt.replace(key, replacer) if txt.indexOf(key) > -1
 				return txt
 			y -= grid.caption / 2
 			if crit.art.name
