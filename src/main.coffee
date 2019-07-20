@@ -230,11 +230,9 @@ class Render
 			tablefont = make_font "Impact", 6
 			print_down = (text, color = @grayscale(160), font = tablefont) =>
 				back = {width: @txt.width(text), height: @txt.height(text)}
-				# @draw.block out, 1 + x + grid.xres * 3.5 - back.width / 2, y, back.width, back.height, 
-				# 	new Pen(Color.Black), new SolidBrush @grayscale(140, 60)
 				@draw.text out, text, font, 2 + x + grid.xres * 3.5, 1 + y, @saturate color, 0.35
 				@draw.text out, text, font, 1 + x + grid.xres * 3.5, y, color
-				y += @txt.height text, font
+				y += -scale + @txt.height text, font
 			delim_line = (color = Color.Gold) =>
 				y += scale;	out.DrawLine new Pen(color), x + grid.xres * 3.05, y, x + grid.xres * 3.95, y; y += scale
 			# Art and nether data drawing.
@@ -252,7 +250,7 @@ class Render
 				delim_line()
 				delim_line()
 				print_down shorten(mod), (if mod[0] is "*" then Color.Orange else Color.Coral) for mod in crit.art.mods
-			else print_down "<no artifact>"
+			else print_down "<no artifact>"; delim_line()
 			if crit.nethtraits.length
 				delim_line()
 				print_down "★#{trait}", @color_code[crit.class], make_font "Dosis", 7 for trait in crit.nethtraits
