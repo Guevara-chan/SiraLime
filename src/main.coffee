@@ -227,13 +227,16 @@ class Render
 					cappen, new SolidBrush @grayscale(40, 200)
 				@draw.text out, crit.art.trait, traitfont, xoff, yoff-scale, @grayscale(160)
 			# Aux procs for additional data drawing.			
-			tablefont = make_font "Dosis", 6
-			print_down = (text, color = @grayscale(160)) =>
+			tablefont = make_font "Impact", 6
+			print_down = (text, color = @grayscale(160), font = tablefont) =>
 				back = {width: @txt.width(text), height: @txt.height(text)}
-				@draw.text out, text, tablefont, 1 + x + grid.xres * 3.5, y, color
-				y += @txt.height text, tablefont
+				# @draw.block out, 1 + x + grid.xres * 3.5 - back.width / 2, y, back.width, back.height, 
+				# 	new Pen(Color.Black), new SolidBrush @grayscale(140, 60)
+				@draw.text out, text, font, 2 + x + grid.xres * 3.5, 1 + y, @saturate color, 0.35
+				@draw.text out, text, font, 1 + x + grid.xres * 3.5, y, color
+				y += @txt.height text, font
 			delim_line = (color = Color.Gold) =>
-				out.DrawLine new Pen(color), x + grid.xres * 3.05, y, x + grid.xres * 3.95, y
+				y += scale;	out.DrawLine new Pen(color), x + grid.xres * 3.05, y, x + grid.xres * 3.95, y; y += scale
 			# Art and nether data drawing.
 			shorten = (txt) ->
 				for key, replacer of {
@@ -245,13 +248,14 @@ class Render
 				return txt
 			y -= grid.caption / 2
 			if crit.art.name
-				print_down "#{crit.art.name}:", Color.Gold
+				print_down ":#{crit.art.name}:", Color.Gold, make_font "Impact", 6.5
+				delim_line()
 				delim_line()
 				print_down shorten(mod), (if mod[0] is "*" then Color.Orange else Color.Coral) for mod in crit.art.mods
 			else print_down "<no artifact>"
 			if crit.nethtraits.length
 				delim_line()
-				print_down "★#{trait}", @color_code[crit.class] for trait in crit.nethtraits
+				print_down "★#{trait}", @color_code[crit.class], make_font "Dosis", 7 for trait in crit.nethtraits
 		return result
 
 	save: (dest) =>		
