@@ -1,6 +1,6 @@
 header = """
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
-	# SiraLime teamcards renderer v0.56
+	# SiraLime teamcards renderer v0.6
 	# Developed in 2019 by Guevara-chan
 	# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 
@@ -186,7 +186,7 @@ class Render
 		@draw.text out, "#{player.name}", hdrfont,	grid.xres * 0.5, -scale/2, Color.Coral
 		@draw.text out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.45, Color.Chocolate
 		@draw.text out, "#{player.class} Mage", subhdrfont, grid.xres*2.5, -scale/2, @saturate @color_code[player.class]
-		@draw.text out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.35, @color_code[player.class]
+		@draw.text out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.375, @color_code[player.class]
 		# Runes drawing.
 		@draw.text out, player.runes.join('|'), make_font("Sylfaen", 7), grid.xres * 1.5, -2, @grayscale 135
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
@@ -240,6 +240,8 @@ class Render
 					'Gained In':		'Per'
 					'Increased ':		''
 					'Additional':		'Extra'
+					'Stat Changes':		'Restat'
+					'Penetration':		'Piercing'
 				} then return txt.replace(key, replacer) if txt.indexOf(key) > -1
 				return txt
 			y -= grid.caption / 2
