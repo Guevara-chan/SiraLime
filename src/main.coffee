@@ -108,12 +108,11 @@ class Render
 		# Init setup.
 		customfonts = new Text.PrivateFontCollection()
 		customfonts.AddFontFile("res/fonts/Dosis-SemiBold.ttf")
-		customfonts.AddFontFile("res/fonts/Impact.ttf")
+		customfonts.AddFontFile("res/fonts/BebasNeue Bold.ttf")
 		customfonts.AddFontFile("res/fonts/Sylfaen.ttf")
 		@fonts		=
-
-			Dosis:		customfonts.Families.GetValue(0)
-			Impact:		customfonts.Families.GetValue(1)
+			Neue:		customfonts.Families.GetValue(0)
+			Dosis:		customfonts.Families.GetValue(1)
 			Sylfaen:	customfonts.Families.GetValue(2)
 		# Actual render.
 		@bmp		= show_off @render pipe s3data
@@ -170,8 +169,8 @@ class Render
 		out			= Graphics.FromImage(result)
 		capfont		= make_font "Dosis",	7.5
 		traitfont	= make_font "Sylfaen",	6.5
-		hdrfont		= make_font "Impact",	7.5
-		subhdrfont	= make_font "Impact",	6
+		hdrfont		= make_font "Neue",	8.5#7.5
+		subhdrfont	= make_font "Neue",	7#6
 		cappen		= new Pen @grayscale(10), 2
 		rbrush		= new SolidBrush @grayscale(40, 210)
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
@@ -187,17 +186,17 @@ class Render
 		hdrbrush = new SolidBrush(Color.FromArgb 40, @color_code[player.class])
 		@draw.block out,0,0,grid.xres,grid.header-3,bgpen,new SolidBrush(Color.FromArgb 40, @color_code[player.class])
 		@draw.block out, grid.xres * 2, 0, grid.xres, grid.header - 1.5 * scale, bgpen, hdrbrush 
-		@draw.text out, "#{player.name}", hdrfont,	grid.xres * 0.5, -scale, Color.Coral
-		@draw.text out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.4, Color.Chocolate
-		@draw.text out, "#{player.class} Mage", subhdrfont, grid.xres * 2.5, -scale, @saturate @color_code[player.class]
-		@draw.text out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.32, @color_code[player.class]
+		@draw.text out, "#{player.name}", hdrfont,	grid.xres * 0.5, -scale/2, Color.Coral
+		@draw.text out, "#{player.title}", subhdrfont, grid.xres * 0.5, grid.header * 0.45, Color.Chocolate
+		@draw.text out, "#{player.class} Mage", subhdrfont, grid.xres*2.5, -scale/2, @saturate @color_code[player.class]
+		@draw.text out, "lvl#{player.level}", hdrfont, grid.xres * 2.5, grid.header*0.35, @color_code[player.class]
 		# Runes drawing.
 		@draw.text out, player.runes.join('|'), make_font("Sylfaen", 7), grid.xres * 1.5, -2, @grayscale 135
-		@draw.text out, player.played,make_font("Impact",5.5),grid.xres*1.25,scale*7.5,@saturate Color.Coral,0.5
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.04, grid.caption * 0.4, grid.xres * 1.96, grid.caption * 0.4
 		# Clock and achievments.
-		@draw.text out, player.achievs.got+"/"+player.achievs.total, make_font("Impact", 5.5), grid.xres * 1.75, 
-			scale * 7.5, Color.FromArgb(120, 120, 0)
+		@draw.text out, player.achievs.got+"/"+player.achievs.total, make_font("Neue", 6.5), grid.xres * 1.75, 
+			scale * 8, Color.FromArgb(120, 120, 0)
+		@draw.text out, player.played,make_font("Neue",6.5),grid.xres*1.25,scale*8,@saturate Color.Coral,0.5
 		out.DrawLine new Pen(Color.DarkGray), grid.xres * 1.5, grid.caption * 0.4, grid.xres * 1.5, grid.caption * 0.75
 		# Crits drawing.
 		for crit, idx in team # Drawing each creaure to canvas.
@@ -229,12 +228,12 @@ class Render
 					cappen, new SolidBrush @grayscale(40, 200)
 				@draw.text out, crit.art.trait, traitfont, xoff, yoff-scale, @grayscale(160)
 			# Aux procs for additional data drawing.			
-			tablefont = make_font "Impact", 6
-			print_down = (text, color = @grayscale(160), font = tablefont) =>
+			tablefont = make_font "Neue", 7
+			print_down = (text, color = @grayscale(160), font = tablefont, offset = 0) =>
 				back = {width: @txt.width(text), height: @txt.height(text)}
 				@draw.text out, text, font, 2 + x + grid.xres * 3.5, 1 + y, @saturate color, 0.35
 				@draw.text out, text, font, 1 + x + grid.xres * 3.5, y, color
-				y += -scale + @txt.height text, font
+				y += -offset + @txt.height text, font
 			delim_line = (color = Color.Gold) =>
 				y += scale;	out.DrawLine new Pen(color), x + grid.xres * 3.05, y, x + grid.xres * 3.95, y; y += scale
 			# Art and nether data drawing.
@@ -248,15 +247,15 @@ class Render
 				return txt
 			y -= grid.caption / 2
 			if crit.art.name
-				print_down ":#{crit.art.name}:", Color.Gold, make_font "Impact", 
-					(if ":#{crit.art.name}:".length > 21 then 6 else 6.5)
+				print_down ":#{crit.art.name}:", Color.Gold, make_font "Neue", 
+					(if crit.art.name.length > 19 then 7.5 else 8)
 				delim_line()
 				delim_line()
 				print_down shorten(mod), (if mod[0] is "*" then Color.Orange else Color.Coral) for mod in crit.art.mods
 			else print_down "<no artifact>"; delim_line()
 			if crit.nethtraits.length
 				delim_line()
-				print_down "★#{trait}", @color_code[crit.class], make_font "Dosis", 7 for trait in crit.nethtraits
+				print_down "★#{trait}",@color_code[crit.class],make_font("Dosis",7),scale for trait in crit.nethtraits
 		return result
 
 	save: (dest) =>		
