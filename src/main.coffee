@@ -111,6 +111,7 @@ class Render
 		customfonts.AddFontFile("res/fonts/Impact.ttf")
 		customfonts.AddFontFile("res/fonts/Sylfaen.ttf")
 		@fonts		=
+
 			Dosis:		customfonts.Families.GetValue(0)
 			Impact:		customfonts.Families.GetValue(1)
 			Sylfaen:	customfonts.Families.GetValue(2)
@@ -139,7 +140,7 @@ class Render
 		lock = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), Imaging.ImageLockMode.ReadOnly,
 			Imaging.PixelFormat.Format24bppRgb)
 		asprite = new Bitmap(img.Width, img.Height, lock.Stride, Imaging.PixelFormat.Format24bppRgb, lock.Scan0)
-		asprite.MakeTransparent asprite.GetPixel(0, 0)
+		if a < 1 then asprite.MakeTransparent asprite.GetPixel(0, 0)
 		asprite.RotateFlip(RotateFlipType[flip]) if flip?
 		out.DrawImage(asprite,
 				new Rectangle(x, y, width, height), 0, 0, asprite.Width, asprite.Height, 
@@ -178,9 +179,10 @@ class Render
 		# BG drawing.
 		bgpen			= new Pen Color.DarkGray, 1
 		bgpen.DashStyle	= Drawing2D.DashStyle.Dash
-		out.DrawImage new Bitmap("res/auxiliary/bg.jpg"), 0, 0, result.Width, result.Height
+		out.DrawImage (bg = new Bitmap("res/auxiliary/bg.jpg")), 0, 0, result.Width/2, result.Height
+		@alpha_blt(out, bg, 1 + result.Width/2, 0, result.Width/2, result.Height, 1, 'RotateNoneFlipX')
 		out.DrawRectangle bgpen, 0, 0, result.Width-1, result.Height-1
-		out.DrawRectangle bgpen, 0, 0, result.Width/2, result.Height+3
+		out.DrawLine bgpen, result.Width/2, -3, result.Width/2, result.Height
 		# Header drawing.
 		hdrbrush = new SolidBrush(Color.FromArgb 40, @color_code[player.class])
 		@draw.block out,0,0,grid.xres,grid.header-3,bgpen,new SolidBrush(Color.FromArgb 40, @color_code[player.class])
@@ -246,7 +248,8 @@ class Render
 				return txt
 			y -= grid.caption / 2
 			if crit.art.name
-				print_down ":#{crit.art.name}:", Color.Gold, make_font "Impact", 6.5
+				print_down ":#{crit.art.name}:", Color.Gold, make_font "Impact", 
+					(if ":#{crit.art.name}:".length > 21 then 6 else 6.5)
 				delim_line()
 				delim_line()
 				print_down shorten(mod), (if mod[0] is "*" then Color.Orange else Color.Coral) for mod in crit.art.mods
