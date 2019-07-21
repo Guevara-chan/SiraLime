@@ -140,7 +140,7 @@ class Render
 			Imaging.PixelFormat.Format24bppRgb)
 		asprite = new Bitmap(img.Width, img.Height, lock.Stride, Imaging.PixelFormat.Format24bppRgb, lock.Scan0)
 		asprite.MakeTransparent asprite.GetPixel(0, 0)
-		asprite.RotateFlip(flip) if flip?
+		asprite.RotateFlip(RotateFlipType[flip]) if flip?
 		out.DrawImage(asprite,
 				new Rectangle(x, y, width, height), 0, 0, asprite.Width, asprite.Height, 
 				GraphicsUnit.Pixel, ia)
@@ -203,8 +203,8 @@ class Render
 			# Sprite drawing.
 			out.SmoothingMode = Drawing2D.SmoothingMode.None
 			out.DrawImage crit.sprite, x, y, grid.xres, grid.yres
-			@alpha_blt(out, crit.sprite, 1 + x + grid.xres * 3, y, grid.xres, grid.yres, 0.3)
 			out.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+			@alpha_blt(out, crit.sprite, 1 + x + grid.xres * 3, y, grid.xres, grid.yres, 0.35, 'RotateNoneFlipX')
 			if crit.nether
 				out.FillEllipse new SolidBrush(Color.FromArgb 110, @color_code[crit.class]), 
 					x + 2.75 * scale, y + 3 * scale, 5 * scale, 5.5 * scale
