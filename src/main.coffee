@@ -107,13 +107,10 @@ class Render
 	constructor: (s3data, pipe, show_off, dest = 'last.png') ->
 		# Init setup.
 		customfonts = new Text.PrivateFontCollection()
-		customfonts.AddFontFile("res/fonts/Dosis-SemiBold.ttf")
-		customfonts.AddFontFile("res/fonts/BebasNeue Bold.ttf")
-		customfonts.AddFontFile("res/fonts/Sylfaen.ttf")
-		@fonts		=
-			Neue:		customfonts.Families.GetValue(0)
-			Dosis:		customfonts.Families.GetValue(1)
-			Sylfaen:	customfonts.Families.GetValue(2)
+		@fonts		=  {}
+		for font, idx in ["Neue", "Dosis", "Sylfaen"]
+			customfonts.AddFontFile("res/fonts/#{font}.ttf")
+			@fonts[font] =	customfonts.Families.GetValue(idx)
 		# Actual render.
 		@bmp		= show_off @render pipe s3data
 		@save(dest) if @bmp
@@ -169,8 +166,8 @@ class Render
 		out			= Graphics.FromImage(result)
 		capfont		= make_font "Dosis",	7.5
 		traitfont	= make_font "Sylfaen",	6.5
-		hdrfont		= make_font "Neue",	8.5#7.5
-		subhdrfont	= make_font "Neue",	7#6
+		hdrfont		= make_font "Neue",	8.5
+		subhdrfont	= make_font "Neue",	7
 		cappen		= new Pen @grayscale(10), 2
 		rbrush		= new SolidBrush @grayscale(40, 210)
 		cappen.DashStyle		= Drawing2D.DashStyle.Dash
@@ -247,8 +244,8 @@ class Render
 				return txt
 			y -= grid.caption / 2
 			if crit.art.name
-				print_down ":#{crit.art.name}:", Color.Gold, make_font "Neue", 
-					(if crit.art.name.length > 19 then 7.5 else 8)
+				print_down ":#{crit.art.name}:", Color.Gold, make_font("Neue", 
+					(if crit.art.name.length > 19 then 7.5 else 8)), scale
 				delim_line()
 				delim_line()
 				print_down shorten(mod), (if mod[0] is "*" then Color.Orange else Color.Coral) for mod in crit.art.mods
