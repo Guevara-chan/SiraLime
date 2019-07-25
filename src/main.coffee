@@ -77,7 +77,11 @@ class SiralimData
 		sprite:		@load_sprite(name)
 		aura:		@get.field(fragment, "Nether Aura: Nether Aura") ? ""
 		nethtraits:	@get.list(fragment, /Nether Trait: (.*)/)
-		gems:		@get.list(fragment, /Gem of (.*) \(Mana Cost: (\d*)\)(?: \| )?(.*)/)
+		gems:		for gem in @get.rawlist(fragment, /Gem of (.*) \(Mana Cost: (\d*)\)(?: \| )?(.*)/)
+			[spoof, name, cost, mods] = gem
+			##################################
+			{name: name, cost: cost, mods: mods.split ', '}
+			##################################
 		stats:		(Object.assign(stats,
 			{[stat]: BigInt @get.field fragment, SiralimData.capitalize(stat) + '( \\(.*\\))?'}) for stat in [
 				'health', 'mana', 'attack', 'intelligence', 'defense', 'speed'])[0]
@@ -348,7 +352,7 @@ class CUI
 				'\n││', 'white', '┌', @color_code[crit.class], 
 				("#{key[0].toUpperCase()}: #{value}" for key,value of crit.stats).join(' '), 'darkGray',
 				'\n│' + (if crit.art.name then '╞' else '╘'), 'white', '▒', @color_code[crit.class], ': ', 'white',
-				(if crit.gems.length then crit.gems.join ', ' else '<no gems>'), 'darkGray')
+				(if crit.gems.length then crit.gems.map((gem) -> gem.name).join ', ' else '<no gems>'), 'darkGray')
 			if crit.nethtraits.length
 				@say('│' + (if crit.art.name then '│' else ' '), 'white', '╙─', @color_code[crit.class],
 					crit.nethtraits.join(' // '), 'yellow')
