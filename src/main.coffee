@@ -30,13 +30,15 @@ class SiralimData
 	@capitalize: (txt) ->
 		txt[0].toUpperCase() + txt[1..]
 
-	get:
+	get: get =
 		field: (feed, field) ->
 			matcher = new RegExp field + ": (.*)"
 			idx = feed?.findIndex((elem) -> matcher.test elem)
 			feed.splice(idx, 1)[0].match(matcher).pop() if idx != -1		
 		list: (feed, matcher) ->
-			feed.filter((x) -> matcher.test x).map((x) -> x.match(matcher)[1])
+			get.rawlist feed, matcher, (x) -> x.match(matcher)[1]
+		rawlist: (feed, matcher, mapper = (x) => x.match(matcher)) ->
+			feed.filter((x) -> matcher.test x).map(mapper)
 
 	player_data: (fragment) ->
 		# Init setup.
@@ -75,7 +77,7 @@ class SiralimData
 		sprite:		@load_sprite(name)
 		aura:		@get.field(fragment, "Nether Aura: Nether Aura") ? ""
 		nethtraits:	@get.list(fragment, /Nether Trait: (.*)/)
-		gems:		@get.list(fragment, /Gem of (.*) \(Mana/)
+		gems:		@get.list(fragment, /Gem of (.*) \(Mana Cost: (\d*)\)(?: \| )?(.*)/)
 		stats:		(Object.assign(stats,
 			{[stat]: BigInt @get.field fragment, SiralimData.capitalize(stat) + '( \\(.*\\))?'}) for stat in [
 				'health', 'mana', 'attack', 'intelligence', 'defense', 'speed'])[0]
@@ -162,7 +164,7 @@ class Render
 			header:	scale * 15
 			xpages:	2
 			ypages: 1
-		result		= new Bitmap 1+grid.xpages*grid.xres*3, grid.header + (grid.yres + grid.caption) * 2 * grid.ypages
+		result		= new Bitmap 1 + grid.xpages*grid.xres*3, grid.header + (grid.yres + grid.caption)*2*grid.ypages
 		out			= Graphics.FromImage(result)
 		capfont		= make_font "Dosis",	7.5
 		traitfont	= make_font "Sylfaen",	6.5
